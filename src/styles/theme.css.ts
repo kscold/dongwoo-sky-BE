@@ -24,7 +24,6 @@ export const vars = createGlobalTheme(':root', {
       100: '#F3F4F6',
       200: '#E5E7EB',
       300: '#D1D5DB',
-      // ... 필요에 따라 추가
     },
     gradientFrom: '#EFF6FF', // pricing 페이지 배경 그라데이션 시작색 (밝은 하늘색 계열)
     gradientTo: '#DBEAFE',   // pricing 페이지 배경 그라데이션 끝색 (더 밝은 하늘색 계열)
