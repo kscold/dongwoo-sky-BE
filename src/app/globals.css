@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+/* 
+  기본 배경색과 글자색은 Tailwind CSS의 기본값 또는
+  Vanilla Extract의 theme.css.ts 및 reset.css.ts에서 관리합니다.
+  필요에 따라 여기에 최소한의 전역 스타일을 추가할 수 있습니다.
+*/
+body {
+  /* 예시: antialiased 렌더링은 layout.tsx에서 next/font를 통해 적용되거나, 
+     Tailwind CSS의 antialiased 클래스를 body에 직접 추가할 수 있습니다. 
+     여기서는 Tailwind가 처리하도록 비워둡니다. */
+}
