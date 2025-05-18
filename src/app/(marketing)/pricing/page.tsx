@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { FaTruckMoving, FaBuilding, FaRegClock, FaCalculator, FaInfoCircle, FaChevronDown } from 'react-icons/fa';
+import { FaTruckMoving, FaBuilding, FaCalculator, FaInfoCircle, FaChevronDown } from 'react-icons/fa';
 import { IconType } from 'react-icons';
+
 import * as styles from '@/styles/pricing.css'; // Vanilla Extract 스타일 import
 
 // 타입 정의
@@ -26,7 +27,7 @@ interface OptionConfig {
   choices?: Record<string, ChoiceDetail>;
 }
 
-interface TruckOptions extends Record<string, OptionConfig> {}
+type TruckOptions = Record<string, OptionConfig>;
 
 interface TruckData {
   name: string;
@@ -34,7 +35,7 @@ interface TruckData {
   options: TruckOptions;
 }
 
-interface PricingData extends Record<string, TruckData> {}
+type PricingData = Record<string, TruckData>;
 
 const pricingData: PricingData = {
   general: {
@@ -91,7 +92,7 @@ const pricingData: PricingData = {
   },
 };
 
-interface SelectedOptions extends Record<string, string | number> {}
+type SelectedOptions = Record<string, string | number>;
 
 export default function PricingPage() {
   const router = useRouter();

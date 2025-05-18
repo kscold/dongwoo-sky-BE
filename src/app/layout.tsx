@@ -1,6 +1,6 @@
 'use client';
 
-import type { Metadata } from "next";
+// import type { Metadata } from "next"; // 사용하지 않으므로 제거
 import { Inter } from "next/font/google";
 import "@/styles/reset.css";
 import "./globals.css";

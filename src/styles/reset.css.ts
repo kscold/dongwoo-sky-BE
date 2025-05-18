@@ -39,7 +39,6 @@ globalStyle('#root, #__next', {
   height: '100%',
 });
 
-// Remove list styles on ul, ol elements with a list role, which suggests default styling will be removed
 globalStyle('ul[role="list"], ol[role="list"]', {
   listStyle: 'none',
 });
@@ -49,7 +48,6 @@ globalStyle('html:focus-within', {
   scrollBehavior: 'smooth',
 });
 
-// A elements that don't have a class get default styles
 globalStyle('a:not([class])', {
   textDecorationSkipInk: 'auto',
 });
@@ -57,5 +55,5 @@ globalStyle('a:not([class])', {
 // Make images easier to work with
 globalStyle('img[alt]', {
   fontStyle: 'italic',
-  color: vars.colors.textLight, // Indicate missing image with placeholder text style
+  color: vars.colors.textLight, 
 }); 

@@ -1,4 +1,4 @@
-import { style, globalStyle } from '@vanilla-extract/css';
+import { style } from '@vanilla-extract/css';
 import { vars } from './theme.css';
 
 export const pageWrapper = style({
@@ -309,5 +309,3 @@ export const processStepDescription = style({
   color: vars.colors.textLight,
   lineHeight: vars.lineHeights.relaxed,
 });
-
-// globalStyle 블록들은 theme.css 수정 없이 직접 값을 사용하도록 변경했으므로 제거합니다.

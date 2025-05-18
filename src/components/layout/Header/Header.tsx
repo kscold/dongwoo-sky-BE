@@ -3,7 +3,8 @@
 import React from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import * as styles from './Header.css';
+
+import * as styles from '../../../styles/Header.css';
 
 const navItems = [
   { href: '/service-guide', label: '서비스 안내' },

@@ -3,15 +3,13 @@
 import React from 'react';
 import Link from 'next/link';
 import {
-  BuildingOffice2Icon, // 장비 아이콘 예시
   WrenchScrewdriverIcon, // 작업 범위 아이콘, 서비스 진행 아이콘
   UserCircleIcon, // 팀원 프로필 아이콘
   CheckCircleIcon, // 작업 가능 범위 아이콘
   ChatBubbleBottomCenterTextIcon, // 서비스 진행 아이콘
   TruckIcon, // 서비스 진행 아이콘
   CreditCardIcon, // 서비스 진행 아이콘
-  PhotoIcon, // 이미지 Placeholder 아이콘
-  // UserIcon // 사용하지 않음
+  PhotoIcon, // 이미지 Placeholder 아이콘  
 } from '@heroicons/react/24/solid';
 import * as styles from '../../../styles/service-guide.css';
 import * as contactStyles from '../../../styles/contact.css'; // 서비스 진행 순서 스타일 재활용
