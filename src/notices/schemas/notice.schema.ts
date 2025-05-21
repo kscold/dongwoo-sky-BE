@@ -19,6 +19,9 @@ export class Notice {
 
   @Prop({ type: Date })
   publishedAt: Date;
+
+  @Prop({ default: [] })
+  attachments: { url: string; key: string; name: string }[];
 }
 
 export const NoticeSchema = SchemaFactory.createForClass(Notice);
