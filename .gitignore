@@ -54,3 +54,17 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# AWS and Serverless
+.serverless/
+aws-iam-policy.json
+*.pem
+*.key
+
+# AWS CLI config (if accidentally added)
+.aws/
+credentials
+
+# Serverless deployment artifacts
+.serverless_plugins/
+serverless_sdk/
