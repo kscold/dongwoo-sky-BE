@@ -2,7 +2,6 @@ service: dongwoo-sky-api
 
 plugins:
   - serverless-offline
-  - serverless-plugin-optimize
 
 provider:
   name: aws
@@ -12,6 +11,21 @@ provider:
   environment:
     MONGODB_URI: ${env:MONGODB_URI}
     NODE_ENV: ${self:provider.stage}
+    AWS_S3_BUCKET_NAME: ${env:AWS_S3_BUCKET_NAME}
+    AWS_CLOUDFRONT_DOMAIN: ${env:AWS_CLOUDFRONT_DOMAIN}
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+            - s3:PutObject
+            - s3:DeleteObject
+          Resource: 'arn:aws:s3:::${env:AWS_S3_BUCKET_NAME}/*'
+        - Effect: Allow
+          Action:
+            - s3:ListBucket
+          Resource: 'arn:aws:s3:::${env:AWS_S3_BUCKET_NAME}'
 
 functions:
   api:
@@ -22,18 +36,16 @@ functions:
           path: /{proxy+}
           cors: true
 
-custom:
-  optimize:
-    external: ['swagger-ui-express']
-
 package:
-  individually: true
+  individually: false
   excludeDevDependencies: true
-  include:
-    - dist/**
-  exclude:
-    - node_modules/**
-    - test/**
-    - src/**
-    - '*.yml'
-    - '*.json'
+  patterns:
+    - '!test/**'
+    - '!src/**'
+    - '!*.yml'
+    - '!*.md'
+    - '!coverage/**'
+    - '!.git/**'
+    - '!.vscode/**'
+    - 'dist/**'
+    - 'package.json'

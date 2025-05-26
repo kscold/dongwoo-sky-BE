@@ -16,20 +16,33 @@ export class S3Service {
   private readonly cloudfrontDomain: string;
 
   constructor(private configService: ConfigService) {
-    this.region = this.configService.get<string>('AWS_REGION');
+    this.region =
+      this.configService.get<string>('AWS_REGION') || 'ap-northeast-2';
     this.bucketName =
       this.configService.get<string>('AWS_S3_BUCKET_NAME') || '';
     this.cloudfrontDomain =
       this.configService.get<string>('AWS_CLOUDFRONT_DOMAIN') || '';
 
-    this.s3Client = new S3Client({
-      region: this.region,
-      credentials: {
-        accessKeyId: this.configService.get<string>('AWS_ACCESS_KEY_ID') || '',
-        secretAccessKey:
-          this.configService.get<string>('AWS_SECRET_ACCESS_KEY') || '',
-      },
-    });
+    // Lambda 환경에서는 IAM 역할을 자동으로 사용, 로컬에서는 환경변수 사용
+    const isLambda = !!process.env.AWS_LAMBDA_FUNCTION_NAME;
+
+    if (isLambda) {
+      // Lambda 환경: IAM 역할 사용
+      this.s3Client = new S3Client({
+        region: this.region,
+      });
+    } else {
+      // 로컬 환경: 환경변수 자격증명 사용
+      this.s3Client = new S3Client({
+        region: this.region,
+        credentials: {
+          accessKeyId:
+            this.configService.get<string>('AWS_ACCESS_KEY_ID') || '',
+          secretAccessKey:
+            this.configService.get<string>('AWS_SECRET_ACCESS_KEY') || '',
+        },
+      });
+    }
   }
 
   /**

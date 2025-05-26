@@ -1,8 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import * as sharp from 'sharp';
 
 @Injectable()
 export class ImageService {
+  private sharp: typeof import('sharp') | null = null;
+
+  constructor() {
+    // Lambda 환경에서는 sharp를 사용하지 않음
+    if (!process.env.AWS_LAMBDA_FUNCTION_NAME) {
+      try {
+        this.sharp = require('sharp');
+      } catch (error) {
+        console.warn('Sharp is not available in this environment');
+      }
+    }
+  }
   /**
    * 이미지를 WebP 형식으로 변환합니다.
    * @param buffer 원본 이미지 버퍼
@@ -15,19 +26,25 @@ export class ImageService {
       quality?: number; // 품질 (1-100, 기본값 80)
       width?: number; // 너비 (픽셀)
       height?: number; // 높이 (픽셀)
-      fit?: keyof sharp.FitEnum; // 맞춤 방식 (cover, contain, fill, inside, outside)
+      fit?: string; // 맞춤 방식 (cover, contain, fill, inside, outside)
     },
   ): Promise<Buffer> {
+    if (!this.sharp) {
+      // Lambda 환경에서는 원본 버퍼를 그대로 반환
+      console.log('Sharp not available, returning original buffer');
+      return buffer;
+    }
+
     try {
       const quality = options?.quality || 80;
-      let sharpInstance = sharp(buffer);
+      let sharpInstance = this.sharp(buffer);
 
       // 이미지 리사이징 적용 (너비나 높이가 지정된 경우)
       if (options?.width || options?.height) {
         sharpInstance = sharpInstance.resize({
           width: options?.width,
           height: options?.height,
-          fit: options?.fit || 'contain',
+          fit: (options?.fit as any) || 'contain',
           withoutEnlargement: true, // 원본보다 크게 확대하지 않음
         });
       }
@@ -45,8 +62,16 @@ export class ImageService {
    * @param buffer 이미지 버퍼
    * @returns 이미지 메타데이터
    */
-  async getImageInfo(buffer: Buffer): Promise<sharp.Metadata> {
-    return await sharp(buffer).metadata();
+  async getImageInfo(buffer: Buffer): Promise<any> {
+    if (!this.sharp) {
+      // Lambda 환경에서는 기본 정보 반환
+      return {
+        format: 'unknown',
+        width: 0,
+        height: 0,
+      };
+    }
+    return await this.sharp(buffer).metadata();
   }
 
   /**
