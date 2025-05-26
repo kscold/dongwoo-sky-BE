@@ -31,6 +31,14 @@ export class NoticesService {
       .exec();
   }
 
+  async findModal(): Promise<Notice[]> {
+    return this.noticeModel
+      .find({ isPublished: true, isModal: true })
+      .sort({ createdAt: -1 })
+      .limit(1) // 가장 최근 모달 공지사항 1개만 반환
+      .exec();
+  }
+
   async findOne(id: string): Promise<Notice> {
     const notice = await this.noticeModel.findById(id).exec();
     if (!notice) {
@@ -41,22 +49,22 @@ export class NoticesService {
 
   async update(id: string, updateNoticeDto: UpdateNoticeDto): Promise<Notice> {
     const updates: any = { ...updateNoticeDto };
-    
+
     // 공개 상태가 변경되었다면 publishedAt 업데이트
     if (updateNoticeDto.isPublished === true) {
       updates.publishedAt = new Date();
     } else if (updateNoticeDto.isPublished === false) {
       updates.publishedAt = null;
     }
-    
+
     const updatedNotice = await this.noticeModel
       .findByIdAndUpdate(id, updates, { new: true })
       .exec();
-      
+
     if (!updatedNotice) {
       throw new NotFoundException(`Notice with ID ${id} not found`);
     }
-    
+
     return updatedNotice;
   }
 

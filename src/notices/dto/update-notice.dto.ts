@@ -6,4 +6,8 @@ export class UpdateNoticeDto extends PartialType(CreateNoticeDto) {
   @IsOptional()
   @IsBoolean()
   isPublished?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  isModal?: boolean;
 }

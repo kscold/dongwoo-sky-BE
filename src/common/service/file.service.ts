@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { S3Service } from '../aws/s3.service';
+import { S3Service } from '../../aws/s3.service';
 import { ImageService } from './image.service';
 
 @Injectable()
@@ -106,6 +106,10 @@ export class FileService {
     let modifiedMimeType = file.mimetype;
     let modifiedOriginalName = file.originalname;
 
+    console.log(
+      `파일 업로드 처리 중: ${file.originalname}, MIME 타입: ${file.mimetype}`,
+    );
+
     // 이미지 압축 옵션이 활성화되고, 이미지이며, 변환 가능한 형식인 경우
     if (
       options?.compressImage !== false && // 명시적으로 false가 아니면 압축 수행
@@ -113,6 +117,8 @@ export class FileService {
       this.imageService.isConvertibleToWebp(file.mimetype)
     ) {
       try {
+        console.log(`이미지 파일 감지 - WebP 변환 시도: ${file.originalname}`);
+
         // 이미지를 WebP로 변환
         const webpBuffer = await this.imageService.convertToWebp(file.buffer, {
           quality: options?.imageOptions?.quality || 80,
@@ -129,20 +135,35 @@ export class FileService {
 
         // 확장자를 WebP로 변경
         modifiedMimeType = 'image/webp';
-        modifiedOriginalName =
-          file.originalname.split('.').slice(0, -1).join('.') + '.webp';
+
+        // 파일명에서 확장자 제거하고 .webp 추가
+        const fileNameParts = file.originalname.split('.');
+        if (fileNameParts.length > 1) {
+          fileNameParts.pop(); // 마지막 확장자 제거
+        }
+        modifiedOriginalName = fileNameParts.join('.') + '.webp';
 
         console.log(
           `이미지가 WebP로 성공적으로 변환되었습니다: ${modifiedOriginalName}`,
         );
       } catch (error) {
-        console.error('이미지 변환 실패, 원본 파일을 업로드합니다:', error);
+        console.error(
+          '이미지 변환 실패, 원본 파일을 업로드합니다:',
+          error.message,
+        );
         // 변환에 실패한 경우 원본 파일 사용
       }
+    } else {
+      console.log(
+        `이미지 변환이 수행되지 않았습니다. 이미지가 아니거나 변환 불가능: ${file.mimetype}`,
+      );
     }
 
-    // S3에 업로드
-    const result = await this.s3Service.uploadFile(fileToUpload, folder);
+    // S3에 업로드할 때 변경된 확장자 정보 전달
+    const result = await this.s3Service.uploadFile(fileToUpload, folder, {
+      originalName: modifiedOriginalName,
+      mimeType: modifiedMimeType,
+    });
 
     return {
       ...result,

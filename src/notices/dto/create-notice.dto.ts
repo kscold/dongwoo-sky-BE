@@ -20,6 +20,10 @@ export class CreateNoticeDto {
   isPublished?: boolean;
 
   @IsOptional()
+  @IsBoolean()
+  isModal?: boolean;
+
+  @IsOptional()
   @IsArray()
   attachments?: { url: string; key: string; name: string }[];
 }

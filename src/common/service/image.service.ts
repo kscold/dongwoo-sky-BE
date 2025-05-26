@@ -66,12 +66,22 @@ export class ImageService {
   isConvertibleToWebp(mimetype: string): boolean {
     const convertibleTypes = [
       'image/jpeg',
+      'image/jpg',
       'image/png',
       'image/gif',
       'image/tiff',
       'image/svg+xml',
       'image/bmp',
+      'image/heic',
+      'image/heif',
+      'image/avif',
     ];
+
+    // 파일 타입이 image로 시작하면 변환 시도
+    if (mimetype.startsWith('image/') && !mimetype.includes('webp')) {
+      return true;
+    }
+
     return convertibleTypes.includes(mimetype);
   }
 }

@@ -1,3 +1,4 @@
+// filepath: /Users/kscold/Desktop/dongwoo-sky-BE/src/notices/notices.controller.ts
 import {
   Controller,
   Get,
@@ -8,23 +9,14 @@ import {
   Delete,
   HttpStatus,
   HttpCode,
-  UseInterceptors,
-  UploadedFiles,
-  UploadedFile,
 } from '@nestjs/common';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { NoticesService } from './notices.service';
 import { CreateNoticeDto } from './dto/create-notice.dto';
 import { UpdateNoticeDto } from './dto/update-notice.dto';
-import { FileService } from '../common/file.service';
-import { AttachmentDto } from './dto/attachment.dto';
 
 @Controller('notices')
 export class NoticesController {
-  constructor(
-    private readonly noticesService: NoticesService,
-    private readonly fileService: FileService,
-  ) {}
+  constructor(private readonly noticesService: NoticesService) {}
 
   @Post()
   @HttpCode(HttpStatus.CREATED)
@@ -42,6 +34,11 @@ export class NoticesController {
     return this.noticesService.findPublished();
   }
 
+  @Get('modal')
+  findModal() {
+    return this.noticesService.findModal();
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.noticesService.findOne(id);
@@ -56,37 +53,5 @@ export class NoticesController {
   @HttpCode(HttpStatus.NO_CONTENT)
   remove(@Param('id') id: string) {
     return this.noticesService.remove(id);
-  }
-
-  @Post('upload')
-  @UseInterceptors(FileInterceptor('file'))
-  async uploadFile(
-    @UploadedFile() file: Express.Multer.File,
-  ): Promise<AttachmentDto> {
-    const result = await this.fileService.uploadFile(file, 'notices');
-    return {
-      url: result.url,
-      key: result.key,
-      name: file.originalname,
-    };
-  }
-
-  @Post('uploads')
-  @UseInterceptors(FilesInterceptor('files', 5)) // 최대 5개 파일 제한
-  async uploadFiles(
-    @UploadedFiles() files: Express.Multer.File[],
-  ): Promise<AttachmentDto[]> {
-    const attachments: AttachmentDto[] = [];
-
-    for (const file of files) {
-      const result = await this.fileService.uploadFile(file, 'notices');
-      attachments.push({
-        url: result.url,
-        key: result.key,
-        name: file.originalname,
-      });
-    }
-
-    return attachments;
   }
 }

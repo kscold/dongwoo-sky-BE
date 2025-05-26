@@ -17,6 +17,9 @@ export class Notice {
   @Prop({ default: true })
   isPublished: boolean;
 
+  @Prop({ default: false })
+  isModal: boolean;
+
   @Prop({ type: Date })
   publishedAt: Date;
 

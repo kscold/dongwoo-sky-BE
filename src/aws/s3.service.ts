@@ -36,17 +36,30 @@ export class S3Service {
    * S3에 파일을 업로드합니다.
    * @param file 업로드할 파일 (multer에서 제공하는 파일 객체)
    * @param folder 파일을 저장할 폴더 경로 (예: 'notices', 'profiles')
+   * @param options 추가 옵션 (변환된 파일 타입 등)
    * @returns 업로드된 파일의 URL과 키
    */
   async uploadFile(
     file: Express.Multer.File,
     folder: string = 'uploads',
+    options?: {
+      originalName?: string;
+      mimeType?: string;
+    },
   ): Promise<{ url: string; key: string }> {
     try {
       // 파일 이름 생성 (고유 ID + 원본 파일명)
       const uniqueId = uuidv4();
-      const originalName = file.originalname;
-      const fileExtension = originalName.split('.').pop();
+
+      // 파일명 및 확장자 결정 (변환된 경우 수정됨)
+      const originalName = options?.originalName || file.originalname;
+      let fileExtension = originalName.split('.').pop()?.toLowerCase();
+
+      // 수정된 MIME 타입을 기반으로 확장자 결정
+      if (options?.mimeType === 'image/webp') {
+        fileExtension = 'webp';
+      }
+
       const fileName = `${uniqueId}_${Date.now()}.${fileExtension}`;
       const key = `${folder}/${fileName}`;
 
@@ -67,9 +80,15 @@ export class S3Service {
       // CloudFront URL 반환 (CloudFront 도메인이 설정된 경우)
       let url = s3Url;
       if (this.cloudfrontDomain) {
-        url = `https://${this.cloudfrontDomain}/${key}`;
+        // cloudfrontDomain에 이미 https://가 포함되어 있지 않은 경우에만 추가
+        if (this.cloudfrontDomain.startsWith('http')) {
+          url = `${this.cloudfrontDomain}/${key}`;
+        } else {
+          url = `https://${this.cloudfrontDomain}/${key}`;
+        }
       }
 
+      console.log(`생성된 URL: ${url}`);
       return {
         url,
         key,
