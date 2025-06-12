@@ -11,6 +11,8 @@ import { EquipmentModule } from './equipment/equipment.module';
 import { ServiceModule } from './service/service.module';
 import { ProfileModule } from './profile/profile.module';
 import { VehicleTypeModule } from './vehicle-type/vehicle-type.module';
+import { LandingPageModule } from './landing-page/landing-page.module';
+import { ContentModule } from './content/content.module';
 
 @Module({
   imports: [
@@ -26,6 +28,8 @@ import { VehicleTypeModule } from './vehicle-type/vehicle-type.module';
     ServiceModule,
     ProfileModule,
     VehicleTypeModule,
+    LandingPageModule,
+    ContentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

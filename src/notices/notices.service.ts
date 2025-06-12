@@ -16,18 +16,27 @@ export class NoticesService {
     const newNotice = new this.noticeModel({
       ...createNoticeDto,
       publishedAt: createNoticeDto.isPublished ? now : null,
+      createdAt: now,
+      updatedAt: now,
     });
     return newNotice.save();
   }
 
-  async findAll(): Promise<Notice[]> {
-    return this.noticeModel.find().sort({ createdAt: -1 }).exec();
+  async findAll(page?: number, limit?: number): Promise<Notice[]> {
+    const query = this.noticeModel.find().sort({ createdAt: -1 });
+
+    if (page && limit) {
+      const skip = (page - 1) * limit;
+      query.skip(skip).limit(limit);
+    }
+
+    return query.exec();
   }
 
   async findPublished(): Promise<Notice[]> {
     return this.noticeModel
       .find({ isPublished: true })
-      .sort({ createdAt: -1 })
+      .sort({ publishedAt: -1, createdAt: -1 })
       .exec();
   }
 
@@ -35,7 +44,7 @@ export class NoticesService {
     return this.noticeModel
       .find({ isPublished: true, isModal: true })
       .sort({ createdAt: -1 })
-      .limit(1) // 가장 최근 모달 공지사항 1개만 반환
+      .limit(1)
       .exec();
   }
 
@@ -48,7 +57,10 @@ export class NoticesService {
   }
 
   async update(id: string, updateNoticeDto: UpdateNoticeDto): Promise<Notice> {
-    const updates: any = { ...updateNoticeDto };
+    const updates: any = {
+      ...updateNoticeDto,
+      updatedAt: new Date(),
+    };
 
     // 공개 상태가 변경되었다면 publishedAt 업데이트
     if (updateNoticeDto.isPublished === true) {
@@ -73,5 +85,22 @@ export class NoticesService {
     if (result.deletedCount === 0) {
       throw new NotFoundException(`Notice with ID ${id} not found`);
     }
+  }
+
+  // 통계 메서드 추가
+  async getStats() {
+    const total = await this.noticeModel.countDocuments().exec();
+    const published = await this.noticeModel
+      .countDocuments({ isPublished: true })
+      .exec();
+    const modal = await this.noticeModel
+      .countDocuments({ isModal: true, isPublished: true })
+      .exec();
+
+    return {
+      totalNotices: total,
+      publishedNotices: published,
+      modalNotices: modal,
+    };
   }
 }
