@@ -76,6 +76,11 @@ export class FileService {
       throw new BadRequestException('파일이 제공되지 않았습니다.');
     }
 
+    // 파일 버퍼 검증
+    if (!file.buffer || file.buffer.length === 0) {
+      throw new BadRequestException('파일 데이터가 비어있습니다.');
+    }
+
     // 파일 확장자 검사
     const allowedExtensions = options?.allowedExtensions || [
       'jpg',
@@ -126,26 +131,33 @@ export class FileService {
           height: options?.imageOptions?.height,
         });
 
-        // 변환된 이미지로 파일 객체 수정
-        fileToUpload = {
-          ...file,
-          buffer: webpBuffer,
-          mimetype: 'image/webp',
-        };
+        // 변환이 성공하고 원본과 다른 경우에만 변환된 파일 사용
+        if (webpBuffer && webpBuffer.length > 0 && webpBuffer !== file.buffer) {
+          // 변환된 이미지로 파일 객체 수정
+          fileToUpload = {
+            ...file,
+            buffer: webpBuffer,
+            mimetype: 'image/webp',
+          };
 
-        // 확장자를 WebP로 변경
-        modifiedMimeType = 'image/webp';
+          // 확장자를 WebP로 변경
+          modifiedMimeType = 'image/webp';
 
-        // 파일명에서 확장자 제거하고 .webp 추가
-        const fileNameParts = file.originalname.split('.');
-        if (fileNameParts.length > 1) {
-          fileNameParts.pop(); // 마지막 확장자 제거
+          // 파일명에서 확장자 제거하고 .webp 추가
+          const fileNameParts = file.originalname.split('.');
+          if (fileNameParts.length > 1) {
+            fileNameParts.pop(); // 마지막 확장자 제거
+          }
+          modifiedOriginalName = fileNameParts.join('.') + '.webp';
+
+          console.log(
+            `이미지가 WebP로 성공적으로 변환되었습니다: ${modifiedOriginalName}`,
+          );
+        } else {
+          console.log(
+            'WebP 변환이 수행되지 않았거나 원본과 동일합니다. 원본 파일을 사용합니다.',
+          );
         }
-        modifiedOriginalName = fileNameParts.join('.') + '.webp';
-
-        console.log(
-          `이미지가 WebP로 성공적으로 변환되었습니다: ${modifiedOriginalName}`,
-        );
       } catch (error) {
         console.error(
           '이미지 변환 실패, 원본 파일을 업로드합니다:',

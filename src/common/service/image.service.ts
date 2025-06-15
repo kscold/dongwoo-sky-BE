@@ -30,7 +30,7 @@ export class ImageService {
     },
   ): Promise<Buffer> {
     if (!this.sharp) {
-      // Lambda 환경에서는 원본 버퍼를 그대로 반환
+      // Sharp가 없는 환경에서는 원본 버퍼를 그대로 반환
       console.log('Sharp not available, returning original buffer');
       return buffer;
     }
@@ -53,7 +53,9 @@ export class ImageService {
       return await sharpInstance.webp({ quality }).toBuffer();
     } catch (error) {
       console.error('이미지 변환 오류:', error);
-      throw new Error('이미지 변환 중 오류가 발생했습니다.');
+      // 변환에 실패한 경우 원본 버퍼 반환
+      console.log('Image conversion failed, returning original buffer');
+      return buffer;
     }
   }
 

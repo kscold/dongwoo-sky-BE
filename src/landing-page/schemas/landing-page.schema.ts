@@ -15,6 +15,10 @@ export class HeroSection {
   @Prop({ required: true })
   backgroundImageUrl: string;
 
+  // 여러 배경 이미지 URL 배열 (최대 10개)
+  @Prop({ type: [String], default: [] })
+  backgroundImageUrls: string[];
+
   @Prop({ required: true })
   description: string;
 

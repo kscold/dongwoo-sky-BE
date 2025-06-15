@@ -81,8 +81,15 @@ export class S3Service {
         Bucket: this.bucketName,
         Key: key,
         Body: file.buffer,
-        ContentType: file.mimetype,
-        ContentDisposition: 'inline', // 또는 'attachment'
+        ContentType: options?.mimeType || file.mimetype,
+        ContentDisposition: 'inline',
+        // 캐시 제어 헤더 추가
+        CacheControl: 'max-age=31536000', // 1년
+        // Metadata 추가 (옵션)
+        Metadata: {
+          'uploaded-by': 'eoullim-sky-api',
+          'upload-time': new Date().toISOString(),
+        },
       });
 
       await this.s3Client.send(command);
