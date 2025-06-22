@@ -8,15 +8,15 @@ import { Model } from 'mongoose';
 import {
   WorkShowcase,
   WorkShowcaseDocument,
-} from './schemas/work-showcase.schema';
+} from './schema/work-showcase.schema';
 import {
   CustomerReview,
   CustomerReviewDocument,
-} from './schemas/customer-review.schema';
+} from './schema/customer-review.schema';
 import {
   ContentSettings,
   ContentSettingsDocument,
-} from './schemas/content-settings.schema';
+} from './schema/content-settings.schema';
 import {
   CreateWorkShowcaseDto,
   UpdateWorkShowcaseDto,

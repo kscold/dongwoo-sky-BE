@@ -5,15 +5,15 @@ import { ContentService } from './content.service';
 import {
   WorkShowcase,
   WorkShowcaseSchema,
-} from './schemas/work-showcase.schema';
+} from './schema/work-showcase.schema';
 import {
   CustomerReview,
   CustomerReviewSchema,
-} from './schemas/customer-review.schema';
+} from './schema/customer-review.schema';
 import {
   ContentSettings,
   ContentSettingsSchema,
-} from './schemas/content-settings.schema';
+} from './schema/content-settings.schema';
 import { AwsModule } from '../aws/aws.module';
 import { AdminModule } from '../admin/admin.module';
 

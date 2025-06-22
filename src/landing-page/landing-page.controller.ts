@@ -24,8 +24,8 @@ import {
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from '../users/schemas/user.schema';
-import { LandingPage } from './schemas/landing-page.schema';
+import { UserRole } from '../users/schema/user.schema';
+import { LandingPage } from './schema/landing-page.schema';
 
 @Controller('landing-pages')
 export class LandingPageController {

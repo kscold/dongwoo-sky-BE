@@ -6,7 +6,7 @@ import {
   IsOptional,
   IsEnum,
 } from 'class-validator';
-import { UserRole } from '../schemas/user.schema';
+import { UserRole } from '../schema/user.schema';
 
 export class CreateUserDto {
   @IsEmail()

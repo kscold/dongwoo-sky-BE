@@ -12,7 +12,7 @@ import { AdminModule } from '../admin/admin.module';
       { name: Equipment.name, schema: EquipmentSchema },
     ]),
     AwsModule,
-    AdminModule, // AdminAuthGuard가 AdminService를 사용하기 위해 추가
+    AdminModule,
   ],
   controllers: [EquipmentController],
   providers: [EquipmentService],

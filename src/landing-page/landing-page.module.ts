@@ -3,7 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { MulterModule } from '@nestjs/platform-express';
 import { LandingPageController } from './landing-page.controller';
 import { LandingPageService } from './landing-page.service';
-import { LandingPage, LandingPageSchema } from './schemas/landing-page.schema';
+import { LandingPage, LandingPageSchema } from './schema/landing-page.schema';
 import { AdminModule } from '../admin/admin.module';
 import { AwsModule } from '../aws/aws.module';
 import { AuthModule } from '../auth/auth.module';

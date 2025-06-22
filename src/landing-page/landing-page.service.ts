@@ -6,10 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import {
-  LandingPage,
-  LandingPageDocument,
-} from './schemas/landing-page.schema';
+import { LandingPage, LandingPageDocument } from './schema/landing-page.schema';
 import {
   CreateLandingPageDto,
   UpdateLandingPageDto,
