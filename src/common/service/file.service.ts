@@ -1,5 +1,5 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
-import { S3Service } from '../../aws/s3.service';
+import { S3Service } from '../aws/s3.service';
 import { ImageService } from './image.service';
 
 @Injectable()
