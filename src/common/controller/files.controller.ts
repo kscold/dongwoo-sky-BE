@@ -11,7 +11,7 @@ import {
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
 import { FileService } from '../service/file.service';
-import { AttachmentDto } from '../../notices/dto/attachment.dto';
+import { AttachmentDto } from '../../service/notices/dto/attachment.dto';
 
 @Controller('files')
 export class FilesController {

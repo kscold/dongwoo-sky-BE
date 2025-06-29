@@ -5,19 +5,19 @@ import { memoryStorage } from 'multer';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { DatabaseModule } from './database/database.module';
-import { NoticesModule } from './notices/notices.module';
-import { AwsModule } from './aws/aws.module';
+import { NoticesModule } from './service/notices/notices.module';
+import { AwsModule } from './common/aws/aws.module';
 import { CommonModule } from './common/common.module';
 import { AdminModule } from './admin/admin.module';
-import { EquipmentModule } from './equipment/equipment.module';
-import { ServiceModule } from './service/service.module';
-import { ProfileModule } from './profile/profile.module';
-import { VehicleTypeModule } from './vehicle-type/vehicle-type.module';
-import { LandingPageModule } from './landing-page/landing-page.module';
-import { ContentModule } from './content/content.module';
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-
+import { EquipmentModule } from './admin/equipment/equipment.module';
+import { ServiceModule } from './admin/service-setting/service.module';
+import { ProfileModule } from './service/profile/profile.module';
+import { VehicleTypeModule } from './admin/vehicle-type/vehicle-type.module';
+import { LandingPageModule } from './service/landing-page/landing-page.module';
+import { ContentModule } from './service/content/content.module';
+import { AuthModule } from './common/auth/auth.module';
+import { UsersModule } from './admin/users/users.module';
+å;
 @Module({
   imports: [
     ConfigModule.forRoot({
