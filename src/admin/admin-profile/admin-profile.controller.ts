@@ -1,8 +1,8 @@
 import { Controller, Get, Patch, Body, UseGuards } from '@nestjs/common';
 
-import { JwtAuthGuard } from '../admin-user/guard/jwt-auth.guard';
-import { RolesGuard } from '../admin-user/guard/roles.guard';
-import { Roles } from '../admin-user/decorator/roles.decorator';
+import { JwtAuthGuard } from '../../common/guard/jwt-auth.guard';
+import { RolesGuard } from '../../common/guard/roles.guard';
+import { Roles } from '../../common/decorator/roles.decorator';
 
 import { AdminProfileService } from './admin-profile.service';
 
@@ -11,7 +11,7 @@ import { UserRole } from '../../schema/user.schema';
 import { AdminProfileUpdateDto } from './dto/request/admin-profile-update.dto';
 import { AdminProfileResponseDto } from './dto/response/admin-profile.response.dto';
 
-@Controller('admin-profile')
+@Controller('admin/profile')
 export class AdminProfileController {
   constructor(private readonly adminProfileService: AdminProfileService) {}
 

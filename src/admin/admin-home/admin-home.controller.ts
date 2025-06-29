@@ -14,11 +14,11 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 
-import { JwtAuthGuard } from '../admin-user/guard/jwt-auth.guard';
-import { RolesGuard } from '../admin-user/guard/roles.guard';
-import { Roles } from '../admin-user/decorator/roles.decorator';
+import { JwtAuthGuard } from '../../common/guard/jwt-auth.guard';
+import { RolesGuard } from '../../common/guard/roles.guard';
+import { Roles } from '../../common/decorator/roles.decorator';
 
-import { fileUploadOptions } from '../../common/file/file-upload.config';
+import { fileUploadOptions } from '../../common/config/file-upload.config';
 
 import { AdminHomeService } from './admin-home.service';
 
@@ -27,7 +27,7 @@ import { AdminHomeCreateDto } from './dto/request/admin-home-create.dto';
 import { AdminHomeUpdateDto } from './dto/request/admin-home-update.dto';
 import { AdminHomeResponseDto } from './dto/response/admin-home.response.dto';
 
-@Controller('admin-home')
+@Controller('admin/home')
 export class AdminHomeController {
   constructor(private readonly adminHomeService: AdminHomeService) {}
 

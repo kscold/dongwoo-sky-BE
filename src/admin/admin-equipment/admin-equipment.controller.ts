@@ -13,8 +13,9 @@ import {
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 
-import { fileUploadOptions } from '../../common/file/file-upload.config';
-import { AdminAuthGuard } from '../admin-user/guard/admin-auth.guard';
+import { fileUploadOptions } from '../../common/config/file-upload.config';
+
+import { AdminAuthGuard } from '../../common/guard/admin-auth.guard';
 
 import { EquipmentService } from './admin-equipment.service';
 import { FileService } from '../../common/file/file.service';
@@ -23,7 +24,7 @@ import { AdminEquipmentCreateDto } from './dto/request/admin-equipment-create.dt
 import { AdminEquipmentUpdateDto } from './dto/request/admin-equipment-update.dto';
 import { AdminEquipmentResponseDto } from './dto/response/admin-equipment.response.dto';
 
-@Controller('equipment')
+@Controller('admin/equipment')
 export class EquipmentController {
   constructor(
     private readonly equipmentService: EquipmentService,
@@ -63,7 +64,21 @@ export class EquipmentController {
   @UseInterceptors(FileInterceptor('file', fileUploadOptions))
   async uploadImage(@UploadedFile() file: Express.Multer.File) {
     // 단일 파일만 허용
-    return this.equipmentService.uploadImage(file);
+    return this.fileService.uploadFile(file, 'equipment', {
+      compressImage: true,
+      imageOptions: { quality: 85, width: 1920 },
+      allowedExtensions: [
+        'jpg',
+        'jpeg',
+        'png',
+        'gif',
+        'webp',
+        'heic',
+        'heif',
+        'avif',
+      ],
+      maxSize: 15 * 1024 * 1024,
+    });
   }
 
   @Patch(':id')

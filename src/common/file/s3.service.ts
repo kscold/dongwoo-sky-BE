@@ -98,19 +98,23 @@ export class S3Service {
       const s3Url = `https://${this.bucketName}.s3.${this.region}.amazonaws.com/${key}`;
 
       // CloudFront URL 반환 (CloudFront 도메인이 설정된 경우)
-      let url = s3Url;
+      let finalUrl = s3Url;
       if (this.cloudfrontDomain) {
-        // cloudfrontDomain에 이미 https://가 포함되어 있지 않은 경우에만 추가
-        if (this.cloudfrontDomain.startsWith('http')) {
-          url = `${this.cloudfrontDomain}/${key}`;
-        } else {
-          url = `https://${this.cloudfrontDomain}/${key}`;
-        }
+        const cdnBase = this.cloudfrontDomain.startsWith('http')
+          ? this.cloudfrontDomain
+          : `https://${this.cloudfrontDomain}`;
+        finalUrl = `${cdnBase}/${key}`;
+        console.log(
+          `CloudFront 도메인이 설정되어 CDN URL을 반환합니다: ${finalUrl}`,
+        );
+      } else {
+        console.log(
+          `CloudFront 도메인이 설정되지 않아 S3 직접 URL을 반환합니다: ${finalUrl}`,
+        );
       }
 
-      console.log(`생성된 URL: ${url}`);
       return {
-        url,
+        url: finalUrl,
         key,
       };
     } catch (error) {

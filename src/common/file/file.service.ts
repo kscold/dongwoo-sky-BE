@@ -2,7 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { S3Service } from './s3.service';
 import { FileToWebpService } from './file-to-webp.service';
 import { HeroImage } from '../../schema/home.schema';
-import { fileUploadOptions, allowedMimes } from './file-upload.config';
+import { fileUploadOptions, allowedMimes } from '../config/file-upload.config';
 
 @Injectable()
 export class FileService {

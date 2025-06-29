@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { json, urlencoded } from 'express';
 
-import { GlobalExceptionFilter } from './common/filters/global-exception.filter';
+import { GlobalExceptionFilter } from './common/filter/global-exception.filter';
 
 import { AppModule } from './app.module';
 

@@ -15,15 +15,19 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { memoryStorage } from 'multer';
 
-import { JwtAuthGuard } from '../admin-user/guard/jwt-auth.guard';
-import { RolesGuard } from '../admin-user/guard/roles.guard';
-import { Roles } from '../admin-user/decorator/roles.decorator';
 
+import { JwtAuthGuard } from '../../common/guard/jwt-auth.guard';
+import { RolesGuard } from '../../common/guard/roles.guard';
+import { Roles } from '../../common/decorator/roles.decorator';
+
+import { AdminHomeCreateDto } from '../admin-home/dto/request/admin-home-create.dto';
+import { AdminHomeUpdateDto } from '../admin-home/dto/request/admin-home-update.dto';
+import { multerOptions } from '../../common/config/multer.config';
 import { AdminHomeService } from './admin-home.service';
+
 import { UserRole } from '../../schema/user.schema';
-import { Home } from '../../schema/home.schema';
+import { Home, HeroImage } from '../../schema/home.schema';
 
 @Controller('admin-home')
 export class AdminHomeController {
@@ -32,7 +36,7 @@ export class AdminHomeController {
   // Public API - 현재 활성화된 홈 데이터 조회
   @Get('current')
   async getCurrentHome(): Promise<Home> {
-    return this.adminHomeService.getMainHomeData();
+    return this.adminHomeService.getMainPageData();
   }
 
   // 어드민 API - 홈 전체 조회
@@ -56,7 +60,7 @@ export class AdminHomeController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.CREATED)
-  async create(@Body() createHomeDto: any): Promise<Home> {
+  async create(@Body() createHomeDto: AdminHomeCreateDto): Promise<Home> {
     return this.adminHomeService.create(createHomeDto);
   }
 
@@ -66,7 +70,7 @@ export class AdminHomeController {
   @Roles(UserRole.ADMIN)
   async update(
     @Param('id') id: string,
-    @Body() updateHomeDto: any,
+    @Body() updateHomeDto: AdminHomeUpdateDto,
   ): Promise<Home> {
     return this.adminHomeService.update(id, updateHomeDto);
   }
@@ -86,7 +90,7 @@ export class AdminHomeController {
   @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.CREATED)
   async ensureMainHomeExists(): Promise<Home> {
-    return this.adminHomeService.ensureMainHomeExists();
+    return this.adminHomeService.ensureMainPageExists();
   }
 
   // 어드민 API - 히어로 이미지 업로드 (단일)
@@ -94,38 +98,11 @@ export class AdminHomeController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.CREATED)
-  @UseInterceptors(
-    FileInterceptor('file', {
-      storage: memoryStorage(),
-      limits: { fileSize: 20 * 1024 * 1024 },
-      fileFilter: (req, file, cb) => {
-        const allowedMimes = [
-          'image/jpeg',
-          'image/jpg',
-          'image/png',
-          'image/gif',
-          'image/webp',
-          'image/heic',
-          'image/heif',
-          'image/avif',
-        ];
-        if (allowedMimes.includes(file.mimetype)) {
-          cb(null, true);
-        } else {
-          cb(
-            new Error(`지원하지 않는 이미지 형식입니다: ${file.mimetype}`),
-            false,
-          );
-        }
-      },
-    }),
-  )
+  @UseInterceptors(FileInterceptor('file', multerOptions))
   async uploadHeroImage(
     @UploadedFile() file: Express.Multer.File,
   ): Promise<{ imageUrl: string }> {
-    if (!file || !file.buffer || file.buffer.length === 0) {
-      throw new BadRequestException('업로드할 파일이 없습니다.');
-    }
+    if (!file) throw new BadRequestException('File is required.');
     return this.adminHomeService.uploadHeroImage(file);
   }
 
@@ -134,49 +111,22 @@ export class AdminHomeController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   @HttpCode(HttpStatus.CREATED)
-  @UseInterceptors(
-    FilesInterceptor('files', 10, {
-      storage: memoryStorage(),
-      limits: { fileSize: 20 * 1024 * 1024, files: 10 },
-      fileFilter: (req, file, cb) => {
-        const allowedMimes = [
-          'image/jpeg',
-          'image/jpg',
-          'image/png',
-          'image/gif',
-          'image/webp',
-          'image/heic',
-          'image/heif',
-          'image/avif',
-        ];
-        if (allowedMimes.includes(file.mimetype)) {
-          cb(null, true);
-        } else {
-          cb(
-            new Error(`지원하지 않는 이미지 형식입니다: ${file.mimetype}`),
-            false,
-          );
-        }
-      },
-    }),
-  )
+  @UseInterceptors(FilesInterceptor('files', 10, multerOptions))
   async uploadHeroImages(
     @UploadedFiles() files: Express.Multer.File[],
   ): Promise<{ imageUrls: string[] }> {
     if (!files || files.length === 0) {
-      throw new BadRequestException('업로드할 파일이 없습니다.');
+      throw new BadRequestException('At least one file is required.');
     }
-    if (files.length > 10) {
-      throw new BadRequestException('최대 10개의 파일만 업로드할 수 있습니다.');
-    }
-    files.forEach((file, index) => {
-      if (!file.buffer || file.buffer.length === 0) {
-        throw new BadRequestException(
-          `파일 ${index + 1}의 데이터가 비어있습니다.`,
-        );
-      }
-    });
     return this.adminHomeService.uploadHeroImages(files);
+  }
+
+  // 어드민 API - 업로드된 히어로 이미지 목록 조회
+  @Get('hero-images')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  async getHeroImages(): Promise<{ images: HeroImage[] }> {
+    return this.adminHomeService.getHeroImages();
   }
 
   // 어드민 API - 히어로 이미지 URL 업데이트 (선택된 이미지를 메인 배경으로 설정)
@@ -188,7 +138,7 @@ export class AdminHomeController {
   }
 
   // 어드민 API - 히어로 이미지 삭제
-  @Delete('hero-images')
+  @Delete('delete-hero-image')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
   async deleteHeroImage(

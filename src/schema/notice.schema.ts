@@ -6,6 +6,7 @@ export type NoticeDocument = Notice & Document;
 @Schema({
   timestamps: true, // createdAt, updatedAt 자동 추가
   versionKey: false, // __v 필드 제거
+  collection: 'notices',
 })
 export class Notice {
   @Prop({ required: true })

@@ -1,39 +1,53 @@
 import {
   IsString,
-  IsArray,
+  IsNotEmpty,
   IsOptional,
-  IsBoolean,
-  IsNumber,
   ValidateNested,
+  IsBoolean,
 } from 'class-validator';
 import { Type } from 'class-transformer';
-import { AdminHomeCreateHeroTitleDto } from './admin-home-create-hero-title.dto';
-import { AdminHomeCreateHeroButtonsDto } from './admin-home-create-hero-buttons.dto';
+
+export class HeroSectionDto {
+  @IsString()
+  @IsNotEmpty()
+  title: string;
+
+  @IsString()
+  @IsNotEmpty()
+  subtitle: string;
+
+  @IsString()
+  @IsNotEmpty()
+  description: string;
+
+  @IsString()
+  @IsNotEmpty()
+  ctaText: string;
+
+  @IsString()
+  @IsNotEmpty()
+  ctaLink: string;
+}
 
 export class AdminHomeCreateDto {
   @IsString()
-  pageId: string;
-
-  @ValidateNested()
-  @Type(() => AdminHomeCreateHeroTitleDto)
-  heroTitle: AdminHomeCreateHeroTitleDto;
+  @IsNotEmpty()
+  key: string;
 
   @IsString()
-  heroSubtitle: string;
+  @IsNotEmpty()
+  title: string;
 
-  @IsArray()
-  @IsString({ each: true })
-  heroImages: string[];
+  @IsString()
+  @IsOptional()
+  description?: string;
 
   @ValidateNested()
-  @Type(() => AdminHomeCreateHeroButtonsDto)
-  heroButtons: AdminHomeCreateHeroButtonsDto;
-
+  @Type(() => HeroSectionDto)
   @IsOptional()
+  heroSection?: HeroSectionDto;
+
   @IsBoolean()
-  isActive?: boolean;
-
   @IsOptional()
-  @IsNumber()
-  sortOrder?: number;
+  isActive?: boolean;
 }

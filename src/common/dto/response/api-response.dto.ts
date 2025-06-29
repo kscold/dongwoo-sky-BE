@@ -1,36 +1,24 @@
-import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
-import {
-  IsBoolean,
-  IsInt,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
+import { IsBoolean, IsInt, IsOptional, IsString } from 'class-validator';
 
 export class ApiResponseDto<T = any> {
-  @ApiProperty({ example: true })
   @IsBoolean()
   @Expose()
   success: boolean;
 
-  @ApiProperty({ example: 200 })
   @IsInt()
   @Expose()
   code: number;
 
-  @ApiProperty({ example: '성공', required: false })
   @IsString()
   @IsOptional()
   @Expose()
   message?: string;
 
-  @ApiProperty({ required: false })
   @IsOptional()
   @Expose()
   data?: T;
 
-  @ApiProperty({ required: false })
   @IsString()
   @IsOptional()
   @Expose()

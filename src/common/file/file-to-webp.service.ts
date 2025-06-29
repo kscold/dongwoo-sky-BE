@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class ImageService {
+export class FileToWebpService {
   private sharp: typeof import('sharp') | null = null;
 
   constructor() {

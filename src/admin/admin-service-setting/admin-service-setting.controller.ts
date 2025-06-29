@@ -7,14 +7,19 @@ import {
   Param,
   Delete,
   UseGuards,
+  HttpStatus,
+  HttpCode,
 } from '@nestjs/common';
+
+import { AdminAuthGuard } from '../../common/guard/admin-auth.guard';
+
 import { ServiceService } from './admin-service-setting.service';
+
 import { AdminServiceSettingCreateRequestDto } from './dto/request/admin-service-setting-create.request.dto';
 import { AdminServiceSettingUpdateRequestDto } from './dto/request/admin-service-setting-update.request.dto';
 import { AdminServiceSettingResponseDto } from './dto/response/admin-service-setting.response.dto';
-import { AdminAuthGuard } from '../admin-user/guard/admin-auth.guard';
 
-@Controller('service')
+@Controller('admin/service-setting')
 export class ServiceController {
   constructor(private readonly serviceService: ServiceService) {}
 
@@ -41,6 +46,7 @@ export class ServiceController {
 
   @Post()
   @UseGuards(AdminAuthGuard)
+  @HttpCode(HttpStatus.OK)
   async create(
     @Body() createServiceDto: AdminServiceSettingCreateRequestDto,
   ): Promise<AdminServiceSettingResponseDto> {
