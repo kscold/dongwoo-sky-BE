@@ -19,6 +19,16 @@ export class Service {
 
   @Prop()
   icon?: string; // 아이콘 이미지 URL (선택사항)
+
+  // SEO 메타 태그 세팅
+  @Prop()
+  metaTitle?: string;
+
+  @Prop()
+  metaDescription?: string;
+
+  @Prop()
+  metaKeywords?: string;
 }
 
 export const ServiceSchema = SchemaFactory.createForClass(Service);

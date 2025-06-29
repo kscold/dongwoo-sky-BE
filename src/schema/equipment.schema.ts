@@ -12,7 +12,7 @@ export class Equipment {
   description: string;
 
   @Prop()
-  imageUrl: string;
+  imageUrl?: string;
 
   @Prop({ default: true })
   isActive: boolean;
@@ -21,22 +21,32 @@ export class Equipment {
   sortOrder: number;
 
   @Prop()
-  specifications: string; // 상세 사양
+  specifications?: string;
+
+  @Prop()
+  priceRange?: string;
+
+  @Prop()
+  tonnage?: string;
+
+  @Prop()
+  maxHeight?: string;
+
+  @Prop()
+  maxWeight?: string;
+
+  @Prop()
+  iconUrl?: string;
 
   @Prop([String])
-  capabilities: string[]; // 작업 가능 범위
+  priceRanges?: string[];
 
-  @Prop()
-  priceRange: string; // 가격 범위
+  // 서비스별 노출 여부
+  @Prop({ default: false })
+  showInService: boolean;
 
-  @Prop()
-  maxHeight: string; // 최대 높이 (스카이차)
-
-  @Prop()
-  maxWeight: string; // 최대 중량 (크레인)
-
-  @Prop()
-  tonnage: string; // 톤수
+  @Prop({ default: false })
+  showInPricing: boolean;
 }
 
 export const EquipmentSchema = SchemaFactory.createForClass(Equipment);

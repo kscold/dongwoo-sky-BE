@@ -2,22 +2,16 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { MulterModule } from '@nestjs/platform-express';
 import { memoryStorage } from 'multer';
+
 import { AppController } from './app.controller';
+
 import { AppService } from './app.service';
+
 import { DatabaseModule } from './database/database.module';
-import { NoticesModule } from './service/notices/notices.module';
-import { AwsModule } from './common/aws/aws.module';
-import { CommonModule } from './common/common.module';
+
 import { AdminModule } from './admin/admin.module';
-import { EquipmentModule } from './admin/equipment/equipment.module';
-import { ServiceModule } from './admin/service-setting/service.module';
-import { ProfileModule } from './service/profile/profile.module';
-import { VehicleTypeModule } from './admin/vehicle-type/vehicle-type.module';
-import { LandingPageModule } from './service/landing-page/landing-page.module';
-import { ContentModule } from './service/content/content.module';
-import { AuthModule } from './common/auth/auth.module';
-import { UsersModule } from './admin/users/users.module';
-å;
+import { ServiceModule } from './service/service.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -59,18 +53,8 @@ import { UsersModule } from './admin/users/users.module';
       },
     }),
     DatabaseModule,
-    AuthModule,
-    UsersModule,
-    NoticesModule,
-    AwsModule,
-    CommonModule,
     AdminModule,
-    EquipmentModule,
     ServiceModule,
-    ProfileModule,
-    VehicleTypeModule,
-    LandingPageModule,
-    ContentModule,
   ],
   controllers: [AppController],
   providers: [AppService],

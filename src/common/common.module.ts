@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { FileService } from './service/file.service';
-import { ImageService } from './service/image.service';
-import { FilesController } from './controller/files.controller';
-import { AwsModule } from './aws/aws.module';
+import { ConfigModule } from '@nestjs/config';
+
+import { S3Service } from './file/s3.service';
+import { FileService } from './file/file.service';
+import { FileToWebpService } from './file/file-to-webp.service';
 
 @Module({
-  imports: [AwsModule],
-  controllers: [FilesController],
-  providers: [FileService, ImageService],
-  exports: [FileService, ImageService],
+  imports: [ConfigModule],
+  providers: [S3Service, FileService, FileToWebpService],
+  exports: [FileService],
 })
 export class CommonModule {}

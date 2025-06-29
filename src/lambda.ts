@@ -1,8 +1,9 @@
-import { Handler, Context } from 'aws-lambda';
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
+import { Handler, Context } from 'aws-lambda';
+import express from 'express';
+
 import { AppModule } from './app.module';
-import * as express from 'express';
 
 const { configure } = require('@vendia/serverless-express');
 
