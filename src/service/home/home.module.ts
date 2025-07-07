@@ -15,6 +15,7 @@ import {
   CustomerReview,
   CustomerReviewSchema,
 } from '../../schema/customer-review.schema';
+import { SiteSettingModule } from '../site-setting/site-setting.module';
 
 @Module({
   imports: [
@@ -24,8 +25,9 @@ import {
       { name: WorkShowcase.name, schema: WorkShowcaseSchema },
       { name: CustomerReview.name, schema: CustomerReviewSchema },
     ]),
+    SiteSettingModule,
   ],
   controllers: [HomeController],
   providers: [HomeService],
 })
-export class HomeModule {}
+export class HomeModule { }

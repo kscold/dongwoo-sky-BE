@@ -1,53 +1,57 @@
 import {
   IsString,
   IsNotEmpty,
-  IsOptional,
+  IsArray,
   ValidateNested,
   IsBoolean,
-} from 'class-validator';
-import { Type } from 'class-transformer';
+} from "class-validator"
+import { Type } from "class-transformer"
 
-export class HeroSectionDto {
+class HeroButtonDto {
   @IsString()
   @IsNotEmpty()
-  title: string;
-
-  @IsString()
-  @IsNotEmpty()
-  subtitle: string;
+  text: string
 
   @IsString()
   @IsNotEmpty()
-  description: string;
+  link: string
+}
+
+class HeroSectionDto {
+  @IsString()
+  @IsNotEmpty()
+  title: string
 
   @IsString()
   @IsNotEmpty()
-  ctaText: string;
+  companyName: string
 
   @IsString()
   @IsNotEmpty()
-  ctaLink: string;
+  highlightText: string
+
+  @IsString()
+  @IsNotEmpty()
+  subtitle: string
+
+  @IsString()
+  @IsNotEmpty()
+  description: string
+
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => HeroButtonDto)
+  ctaButtons: HeroButtonDto[]
+
+  @IsArray()
+  backgroundImages: any[]
+
+  @IsBoolean()
+  isActive: boolean
 }
 
 export class AdminHomeCreateDto {
-  @IsString()
-  @IsNotEmpty()
-  key: string;
-
-  @IsString()
-  @IsNotEmpty()
-  title: string;
-
-  @IsString()
-  @IsOptional()
-  description?: string;
-
   @ValidateNested()
   @Type(() => HeroSectionDto)
-  @IsOptional()
-  heroSection?: HeroSectionDto;
-
-  @IsBoolean()
-  @IsOptional()
-  isActive?: boolean;
+  heroSection: HeroSectionDto
 }

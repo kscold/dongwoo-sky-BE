@@ -1,6 +1,16 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
+@Schema({ _id: false })
+class Attachment {
+  @Prop({ required: true })
+  fileUrl: string;
+
+  @Prop({ required: true })
+  fileName: string;
+}
+const AttachmentSchema = SchemaFactory.createForClass(Attachment);
+
 export type NoticeDocument = Notice & Document;
 
 @Schema({
@@ -21,11 +31,20 @@ export class Notice {
   @Prop({ default: false })
   isModal: boolean;
 
-  @Prop({ type: Date })
-  publishedAt: Date;
+  @Prop({ type: Date, required: false })
+  modalEndDate?: Date;
 
-  @Prop({ default: [] })
-  attachments: { url: string; key: string; name: string }[];
+  @Prop({ required: false, default: '관리자' })
+  author?: string;
+
+  @Prop({ type: [String], required: false, default: [] })
+  tags?: string[];
+
+  @Prop({ default: false })
+  isPinned: boolean;
+
+  @Prop({ type: [AttachmentSchema], default: [] })
+  attachments: Attachment[];
 }
 
 export const NoticeSchema = SchemaFactory.createForClass(Notice);

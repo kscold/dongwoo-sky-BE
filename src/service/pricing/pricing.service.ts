@@ -8,14 +8,14 @@ export class PricingService {
   constructor(
     @InjectModel(Equipment.name)
     private equipmentModel: Model<EquipmentDocument>,
-  ) {}
+  ) { }
 
   async getEquipmentsForPricing(): Promise<Equipment[]> {
     try {
       return await this.equipmentModel
-        .find({ isActive: true, showInPricing: true })
+        .find({ isPublished: true, showInPricing: true })
         .sort({ sortOrder: 1 })
-        .limit(30)
+        .limit(50)
         .exec();
     } catch (error) {
       // TODO: Add logger

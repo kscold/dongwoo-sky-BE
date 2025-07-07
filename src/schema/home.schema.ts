@@ -11,9 +11,26 @@ export interface HeroImage {
 }
 
 @Schema({ _id: false })
+export class HeroButton {
+  @Prop({ required: true })
+  text: string;
+
+  @Prop({ required: true })
+  link: string;
+}
+
+const HeroButtonSchema = SchemaFactory.createForClass(HeroButton);
+
+@Schema({ _id: false })
 export class HeroSection {
   @Prop({ required: true, default: '어울림 스카이' })
   title: string;
+
+  @Prop({ required: true, default: '어울림 스카이' })
+  companyName: string;
+
+  @Prop({ required: true, default: '어울림 스카이' })
+  highlightText: string;
 
   @Prop({
     required: true,
@@ -24,14 +41,8 @@ export class HeroSection {
   @Prop({ required: true })
   description: string;
 
-  @Prop({ required: true, default: '무료 견적 문의' })
-  ctaText: string;
-
-  @Prop({ required: true, default: '/contact' })
-  ctaLink: string;
-
-  @Prop({ default: '' })
-  backgroundImageUrl: string;
+  @Prop({ type: [HeroButtonSchema], default: [] })
+  ctaButtons: HeroButton[];
 
   @Prop({
     type: [
@@ -45,7 +56,7 @@ export class HeroSection {
     ],
     default: [],
   })
-  backgroundImages: HeroImage[];
+  backgroundImageUrls: HeroImage[];
 
   @Prop({ default: true })
   isActive: boolean;
@@ -61,9 +72,6 @@ export class HomeContentSetting {
 
   @Prop({ required: true })
   description: string;
-
-  @Prop({ required: true })
-  value: string;
 
   @Prop({ default: true })
   isActive: boolean;

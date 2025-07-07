@@ -6,13 +6,31 @@ export type SiteSettingDocument = SiteSetting & Document;
 @Schema({ timestamps: true, collection: 'site_settings' })
 export class SiteSetting {
   @Prop({ default: 'global_settings', unique: true })
-  identifier: string;
+  key: string;
 
   @Prop()
   contactPhoneNumber?: string;
 
   @Prop()
   kakaoOpenChatUrl?: string;
+
+  @Prop()
+  metaTitle?: string;
+
+  @Prop()
+  metaDescription?: string;
+
+  @Prop()
+  metaKeywords?: string;
+
+  @Prop()
+  companyName?: string;
+
+  @Prop()
+  businessRegistrationNumber?: string;
+
+  @Prop()
+  address?: string;
 }
 
 export const SiteSettingSchema = SchemaFactory.createForClass(SiteSetting);

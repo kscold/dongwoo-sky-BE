@@ -8,6 +8,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 
 import { DatabaseModule } from './database/database.module';
+import { AuthModule } from './common/auth/auth.module';
 
 import { AdminModule } from './admin/admin.module';
 import { ServiceModule } from './service/service.module';
@@ -52,6 +53,7 @@ import { ServiceModule } from './service/service.module';
         }
       },
     }),
+    AuthModule,
     DatabaseModule,
     AdminModule,
     ServiceModule,
@@ -59,4 +61,4 @@ import { ServiceModule } from './service/service.module';
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

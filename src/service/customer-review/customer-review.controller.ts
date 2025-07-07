@@ -4,7 +4,7 @@ import { CustomerReviewService } from './customer-review.service';
 
 @Controller('service/customer-review')
 export class CustomerReviewController {
-  constructor(private readonly customerReviewService: CustomerReviewService) {}
+  constructor(private readonly customerReviewService: CustomerReviewService) { }
 
   @Get()
   async findAll(

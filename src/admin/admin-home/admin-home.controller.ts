@@ -12,7 +12,7 @@ import {
   UseInterceptors,
   UploadedFiles,
 } from '@nestjs/common';
-import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
+import { FilesInterceptor } from '@nestjs/platform-express';
 
 import { JwtAuthGuard } from '../../common/guard/jwt-auth.guard';
 import { RolesGuard } from '../../common/guard/roles.guard';
@@ -29,7 +29,7 @@ import { AdminHomeResponseDto } from './dto/response/admin-home.response.dto';
 
 @Controller('admin/home')
 export class AdminHomeController {
-  constructor(private readonly adminHomeService: AdminHomeService) {}
+  constructor(private readonly adminHomeService: AdminHomeService) { }
 
   @Get()
   @UseGuards(JwtAuthGuard, RolesGuard)
@@ -50,7 +50,7 @@ export class AdminHomeController {
   @Post()
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  @HttpCode(HttpStatus.CREATED)
+  @HttpCode(HttpStatus.OK)
   async create(
     @Body() createHomeDto: AdminHomeCreateDto,
   ): Promise<AdminHomeResponseDto> {
@@ -72,7 +72,7 @@ export class AdminHomeController {
   @Delete(':id')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  @HttpCode(HttpStatus.NO_CONTENT)
+  @HttpCode(HttpStatus.OK)
   async remove(@Param('id') id: string) {
     return this.adminHomeService.remove(id);
   }
@@ -80,37 +80,21 @@ export class AdminHomeController {
   @Post('initialize')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  @HttpCode(HttpStatus.CREATED)
+  @HttpCode(HttpStatus.OK)
   async ensureMainHomeExists() {
     return this.adminHomeService.ensureMainHomeExists();
-  }
-
-  @Post('upload-hero-image')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  @HttpCode(HttpStatus.CREATED)
-  @UseInterceptors(FileInterceptor('file', fileUploadOptions))
-  async uploadHeroImage(@UploadedFiles() files: Express.Multer.File[]) {
-    // 단일 파일만 허용
-    const file = Array.isArray(files) ? files[0] : files;
-    return this.adminHomeService.uploadHeroImage(file);
   }
 
   @Post('upload-hero-images')
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles(UserRole.ADMIN)
-  @HttpCode(HttpStatus.CREATED)
+  @HttpCode(HttpStatus.OK)
   @UseInterceptors(FilesInterceptor('files', 10, fileUploadOptions))
   async uploadHeroImages(@UploadedFiles() files: Express.Multer.File[]) {
     return this.adminHomeService.uploadHeroImages(files);
   }
 
-  @Patch('set-hero-image')
-  @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles(UserRole.ADMIN)
-  async setHeroImage(@Body() body: { imageUrl: string }) {
-    return this.adminHomeService.setHeroImage(body.imageUrl);
-  }
+
 
   @Delete('hero-images')
   @UseGuards(JwtAuthGuard, RolesGuard)

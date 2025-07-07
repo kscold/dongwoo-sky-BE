@@ -9,4 +9,9 @@ export class NoticeController {
   async getModalNotice() {
     return await this.noticeService.getModalNotice();
   }
+
+  @Get('published')
+  async getPublishedNotices() {
+    return await this.noticeService.getPublishedNotices();
+  }
 }

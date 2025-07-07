@@ -6,9 +6,10 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Equipment, EquipmentDocument } from '../../schema/equipment.schema';
-import { AdminEquipmentCreateDto } from './dto/request/admin-equipment-create.dto';
-import { AdminEquipmentUpdateDto } from './dto/request/admin-equipment-update.dto';
-import { AdminEquipmentResponseDto } from './dto/response/admin-equipment.response.dto';
+import { AdminEquipmentCreateRequestDto } from './dto/request/admin-equipment-create-request.dto';
+import { AdminEquipmentUpdateRequestDto } from './dto/request/admin-equipment-update-request.dto';
+import { AdminEquipmentResponseDto } from './dto/response/admin-equipment-response.dto';
+
 import { FileService } from '../../common/file/file.service';
 
 @Injectable()
@@ -17,7 +18,7 @@ export class EquipmentService {
     @InjectModel(Equipment.name)
     private equipmentModel: Model<EquipmentDocument>,
     private readonly fileService: FileService,
-  ) {}
+  ) { }
 
   private toResponseDto(equipment: Equipment): AdminEquipmentResponseDto {
     return {
@@ -25,9 +26,10 @@ export class EquipmentService {
       name: equipment.name,
       description: equipment.description,
       imageUrl: equipment.imageUrl,
-      isActive: equipment.isActive,
+      isPublished: equipment.isPublished,
       sortOrder: equipment.sortOrder,
       specifications: equipment.specifications,
+      capabilities: equipment.capabilities,
       priceRange: equipment.priceRange,
       tonnage: equipment.tonnage,
       maxHeight: equipment.maxHeight,
@@ -42,48 +44,48 @@ export class EquipmentService {
   }
 
   async create(
-    createEquipmentDto: AdminEquipmentCreateDto,
-  ): Promise<{ data: AdminEquipmentResponseDto }> {
+    createEquipmentDto: AdminEquipmentCreateRequestDto,
+  ): Promise<AdminEquipmentResponseDto> {
     try {
       const equipment = new this.equipmentModel(createEquipmentDto);
       const saved = await equipment.save();
-      return { data: this.toResponseDto(saved) };
+      return this.toResponseDto(saved);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
   }
 
-  async findAll(): Promise<{ data: AdminEquipmentResponseDto[] }> {
+  async findAll(): Promise<AdminEquipmentResponseDto[]> {
     try {
       const result = await this.equipmentModel
-        .find({ isActive: true })
+        .find({ isPublished: true })
         .sort({ sortOrder: 1, createdAt: 1 })
         .exec();
-      return { data: result.map(this.toResponseDto) };
+      return result.map(this.toResponseDto);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
   }
 
-  async findAllAdmin(): Promise<{ data: AdminEquipmentResponseDto[] }> {
+  async findAllAdmin(): Promise<AdminEquipmentResponseDto[]> {
     try {
       const result = await this.equipmentModel
         .find()
         .sort({ sortOrder: 1, createdAt: 1 })
         .exec();
-      return { data: result.map(this.toResponseDto) };
+      return result.map(this.toResponseDto);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
   }
 
-  async findOne(id: string): Promise<{ data: AdminEquipmentResponseDto }> {
+  async findOne(id: string): Promise<AdminEquipmentResponseDto> {
     try {
       const equipment = await this.equipmentModel.findById(id).exec();
       if (!equipment) {
         throw new NotFoundException('장비를 찾을 수 없습니다.');
       }
-      return { data: this.toResponseDto(equipment) };
+      return this.toResponseDto(equipment);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
@@ -91,8 +93,8 @@ export class EquipmentService {
 
   async update(
     id: string,
-    updateEquipmentDto: AdminEquipmentUpdateDto,
-  ): Promise<{ data: AdminEquipmentResponseDto }> {
+    updateEquipmentDto: AdminEquipmentUpdateRequestDto,
+  ): Promise<AdminEquipmentResponseDto> {
     try {
       const equipment = await this.equipmentModel
         .findByIdAndUpdate(id, updateEquipmentDto, { new: true })
@@ -100,31 +102,29 @@ export class EquipmentService {
       if (!equipment) {
         throw new NotFoundException('장비를 찾을 수 없습니다.');
       }
-      return { data: this.toResponseDto(equipment) };
+      return this.toResponseDto(equipment);
     } catch (e) {
       throw new BadRequestException(e.message);
     }
   }
 
-  async remove(id: string): Promise<{ success: boolean }> {
+  async remove(id: string): Promise<void> {
     try {
       const result = await this.equipmentModel.findByIdAndDelete(id).exec();
       if (!result) {
         throw new NotFoundException('장비를 찾을 수 없습니다.');
       }
-      return { success: true };
     } catch (e) {
       throw new BadRequestException(e.message);
     }
   }
 
-  async updateSortOrder(equipmentIds: string[]): Promise<{ success: boolean }> {
+  async updateSortOrder(equipmentIds: string[]): Promise<void> {
     try {
       const updatePromises = equipmentIds.map((id, index) =>
         this.equipmentModel.findByIdAndUpdate(id, { sortOrder: index }).exec(),
       );
       await Promise.all(updatePromises);
-      return { success: true };
     } catch (e) {
       throw new BadRequestException(e.message);
     }
