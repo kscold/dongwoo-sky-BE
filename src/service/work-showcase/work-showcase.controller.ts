@@ -3,6 +3,7 @@ import {
   Get,
   Post,
   Param,
+  Query,
   NotFoundException,
 } from '@nestjs/common';
 
@@ -13,8 +14,14 @@ export class WorkShowcaseController {
   constructor(private readonly workShowcaseService: WorkShowcaseService) { }
 
   @Get()
-  async findAll() {
-    return this.workShowcaseService.findAll();
+  async findAll(
+    @Query('page') page: string = '1',
+    @Query('limit') limit: string = '10',
+  ) {
+    const pageNumber = parseInt(page, 10);
+    const limitNumber = parseInt(limit, 10);
+    
+    return this.workShowcaseService.findAll(pageNumber, limitNumber);
   }
 
   @Get(':id')

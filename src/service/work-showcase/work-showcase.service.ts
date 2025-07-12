@@ -17,12 +17,35 @@ export class WorkShowcaseService {
     private workShowcaseModel: Model<WorkShowcaseDocument>,
   ) { }
 
-  async findAll(): Promise<WorkShowcase[]> {
+  async findAll(page: number = 1, limit: number = 10): Promise<{
+    data: WorkShowcase[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  }> {
     try {
-      return this.workShowcaseModel
-        .find({ isActive: true })
-        .sort({ publishedAt: -1 })
-        .exec();
+      const skip = (page - 1) * limit;
+      
+      const [data, total] = await Promise.all([
+        this.workShowcaseModel
+          .find({ isActive: true })
+          .sort({ publishedAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .exec(),
+        this.workShowcaseModel.countDocuments({ isActive: true }).exec(),
+      ]);
+
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        data,
+        total,
+        page,
+        limit,
+        totalPages,
+      };
     } catch (error) {
       // TODO: Add logger
       throw new InternalServerErrorException(
@@ -33,7 +56,7 @@ export class WorkShowcaseService {
 
   async findOne(id: string): Promise<WorkShowcase> {
     try {
-      const showcase = await this.workShowcaseModel.findById(id).exec();
+      const showcase = await this.workShowcaseModel.findOne({ _id: id, isActive: true }).exec();
       if (!showcase) {
         throw new NotFoundException(`Work showcase with ID "${id}" not found`);
       }

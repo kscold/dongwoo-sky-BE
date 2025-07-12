@@ -62,6 +62,31 @@ export class PricingSetting {
     @Prop({ required: true })
     phoneNumber: string;
 
+    // 추가 UI 라벨들
+    @Prop({ default: '선택한 작업 시간' })
+    timeSelectionLabel: string;
+
+    @Prop({ default: '시간' })
+    hourUnit: string;
+
+    @Prop({ default: '기본' })
+    baseHoursLabel: string;
+
+    @Prop({ default: '추가' })
+    additionalHoursLabel: string;
+
+    @Prop({ default: '시간당' })
+    hourlyRateLabel: string;
+
+    @Prop({ default: '주요 사양' })
+    specificationsLabel: string;
+
+    @Prop({ default: '왼쪽으로 스크롤' })
+    scrollLeftAriaLabel: string;
+
+    @Prop({ default: '오른쪽으로 스크롤' })
+    scrollRightAriaLabel: string;
+
     @Prop({ default: true })
     isActive: boolean;
 

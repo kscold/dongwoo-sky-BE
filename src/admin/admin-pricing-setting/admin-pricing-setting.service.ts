@@ -73,6 +73,15 @@ export class AdminPricingSettingService {
             ctaSubtext: '전문 상담사가 친절하게 안내해드립니다',
             detailCardTitle: '상세 견적을 원하시나요?',
             phoneNumber: '1588-0000',
+            // 추가 UI 라벨 기본값
+            timeSelectionLabel: '선택한 작업 시간',
+            hourUnit: '시간',
+            baseHoursLabel: '기본',
+            additionalHoursLabel: '추가',
+            hourlyRateLabel: '시간당',
+            specificationsLabel: '주요 사양',
+            scrollLeftAriaLabel: '왼쪽으로 스크롤',
+            scrollRightAriaLabel: '오른쪽으로 스크롤',
             isActive: true
         };
 
@@ -101,6 +110,15 @@ export class AdminPricingSettingService {
             ctaSubtext: pricingSetting.ctaSubtext,
             detailCardTitle: pricingSetting.detailCardTitle,
             phoneNumber: pricingSetting.phoneNumber,
+            // 추가 UI 라벨들
+            timeSelectionLabel: pricingSetting.timeSelectionLabel,
+            hourUnit: pricingSetting.hourUnit,
+            baseHoursLabel: pricingSetting.baseHoursLabel,
+            additionalHoursLabel: pricingSetting.additionalHoursLabel,
+            hourlyRateLabel: pricingSetting.hourlyRateLabel,
+            specificationsLabel: pricingSetting.specificationsLabel,
+            scrollLeftAriaLabel: pricingSetting.scrollLeftAriaLabel,
+            scrollRightAriaLabel: pricingSetting.scrollRightAriaLabel,
             isActive: pricingSetting.isActive,
             createdAt: pricingSetting.createdAt,
             updatedAt: pricingSetting.updatedAt,

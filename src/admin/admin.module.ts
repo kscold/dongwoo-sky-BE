@@ -9,12 +9,16 @@ import { AdminSiteSettingModule } from './admin-site-setting/admin-site-setting.
 import { AdminEquipmentModule } from './admin-equipment/admin-equipment.module';
 import { AdminWorkShowcaseModule } from './admin-work-showcase/admin-work-showcase.module';
 import { AdminPricingSettingModule } from './admin-pricing-setting/admin-pricing-setting.module';
+import { CustomerReviewModule } from './customer-review/customer-review.module';
+import { AdminStatsModule } from './admin-stats/admin-stats.module';
 
 @Module({
   imports: [
     AdminEquipmentModule,
     AdminWorkShowcaseModule,
     AdminPricingSettingModule,
+    CustomerReviewModule,
+    AdminStatsModule,
     forwardRef(() => AdminUserModule),
     AdminHomeModule,
     AdminContactModule,

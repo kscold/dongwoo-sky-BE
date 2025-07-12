@@ -6,6 +6,7 @@ import { ServiceGuideModule } from './service-guide/service-guide.module';
 import { WorkShowcaseModule } from './work-showcase/work-showcase.module';
 import { CustomerReviewModule } from './customer-review/customer-review.module';
 import { SiteSettingModule } from './site-setting/site-setting.module';
+import { ContactModule } from './contact/contact.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { SiteSettingModule } from './site-setting/site-setting.module';
     WorkShowcaseModule,
     CustomerReviewModule,
     SiteSettingModule,
+    ContactModule,
   ],
 })
 export class ServiceModule { }

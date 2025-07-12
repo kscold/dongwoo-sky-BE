@@ -93,6 +93,39 @@ export class AdminPricingSettingUpdateRequestDto {
     @IsOptional()
     phoneNumber?: string;
 
+    // 추가 UI 라벨들
+    @IsString()
+    @IsOptional()
+    timeSelectionLabel?: string;
+
+    @IsString()
+    @IsOptional()
+    hourUnit?: string;
+
+    @IsString()
+    @IsOptional()
+    baseHoursLabel?: string;
+
+    @IsString()
+    @IsOptional()
+    additionalHoursLabel?: string;
+
+    @IsString()
+    @IsOptional()
+    hourlyRateLabel?: string;
+
+    @IsString()
+    @IsOptional()
+    specificationsLabel?: string;
+
+    @IsString()
+    @IsOptional()
+    scrollLeftAriaLabel?: string;
+
+    @IsString()
+    @IsOptional()
+    scrollRightAriaLabel?: string;
+
     @IsBoolean()
     @IsOptional()
     isActive?: boolean;

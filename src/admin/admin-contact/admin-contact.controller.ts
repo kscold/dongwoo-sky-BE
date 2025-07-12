@@ -1,10 +1,11 @@
-import { Controller, Get, Param, Patch, UseGuards } from '@nestjs/common';
+import { Controller, Get, Param, Patch, UseGuards, Put, Body, Query } from '@nestjs/common';
 
 import { Roles } from '../../common/decorator/roles.decorator';
 import { JwtAuthGuard } from '../../common/guard/jwt-auth.guard';
 import { RolesGuard } from '../../common/guard/roles.guard';
 
 import { AdminContactService } from './admin-contact.service';
+import { ContactService } from '../../service/contact/contact.service';
 
 import { UserRole } from '../../schema/user.schema';
 
@@ -14,7 +15,10 @@ import { AdminContactListResponseDto } from './dto/response/admin-contact-list-r
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN)
 export class AdminContactController {
-  constructor(private readonly adminContactService: AdminContactService) {}
+  constructor(
+    private readonly adminContactService: AdminContactService,
+    private readonly contactService: ContactService,
+  ) {}
 
   @Get('list')
   async getContactList(): Promise<AdminContactListResponseDto> {
@@ -24,5 +28,18 @@ export class AdminContactController {
   @Patch(':id/read')
   async markAsRead(@Param('id') id: string): Promise<{ success: boolean }> {
     return this.adminContactService.markAsRead(id);
+  }
+
+  @Get('settings')
+  async getContactSettings() {
+    return await this.contactService.getContactSettings();
+  }
+
+  @Get('inquiries')
+  async getAllInquiries(
+    @Query('page') page: number = 1,
+    @Query('limit') limit: number = 10,
+  ) {
+    return await this.contactService.getAllInquiries(page, limit);
   }
 }

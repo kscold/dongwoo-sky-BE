@@ -19,6 +19,15 @@ export class AdminPricingSettingResponseDto {
     ctaSubtext: string;
     detailCardTitle: string;
     phoneNumber: string;
+    // 추가 UI 라벨들
+    timeSelectionLabel: string;
+    hourUnit: string;
+    baseHoursLabel: string;
+    additionalHoursLabel: string;
+    hourlyRateLabel: string;
+    specificationsLabel: string;
+    scrollLeftAriaLabel: string;
+    scrollRightAriaLabel: string;
     isActive: boolean;
     createdAt?: Date;
     updatedAt?: Date;
