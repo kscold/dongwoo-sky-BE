@@ -1,14 +1,19 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
-import { Contact, ContactSchema } from '../../schema/contact.schema';
 import { ContactController } from './contact.controller';
 import { ContactService } from './contact.service';
+import { ContactSetting, ContactSettingSchema } from '../../schema/contact-setting.schema';
+import { ContactInquiry, ContactInquirySchema } from '../../schema/contact-inquiry.schema';
 
 @Module({
   imports: [
-    MongooseModule.forFeature([{ name: Contact.name, schema: ContactSchema }]),
+    MongooseModule.forFeature([
+      { name: ContactSetting.name, schema: ContactSettingSchema },
+      { name: ContactInquiry.name, schema: ContactInquirySchema },
+    ]),
   ],
   controllers: [ContactController],
   providers: [ContactService],
+  exports: [ContactService],
 })
 export class ContactModule {}

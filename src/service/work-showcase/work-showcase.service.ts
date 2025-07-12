@@ -15,16 +15,37 @@ export class WorkShowcaseService {
   constructor(
     @InjectModel(WorkShowcase.name)
     private workShowcaseModel: Model<WorkShowcaseDocument>,
-  ) {}
+  ) { }
 
-  async findAll(page: number, limit: number): Promise<WorkShowcase[]> {
+  async findAll(page: number = 1, limit: number = 10): Promise<{
+    data: WorkShowcase[];
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  }> {
     try {
-      return this.workShowcaseModel
-        .find({ isPublished: true })
-        .sort({ publishedAt: -1 })
-        .skip((page - 1) * limit)
-        .limit(limit)
-        .exec();
+      const skip = (page - 1) * limit;
+      
+      const [data, total] = await Promise.all([
+        this.workShowcaseModel
+          .find({ isActive: true })
+          .sort({ publishedAt: -1 })
+          .skip(skip)
+          .limit(limit)
+          .exec(),
+        this.workShowcaseModel.countDocuments({ isActive: true }).exec(),
+      ]);
+
+      const totalPages = Math.ceil(total / limit);
+
+      return {
+        data,
+        total,
+        page,
+        limit,
+        totalPages,
+      };
     } catch (error) {
       // TODO: Add logger
       throw new InternalServerErrorException(
@@ -35,10 +56,14 @@ export class WorkShowcaseService {
 
   async findOne(id: string): Promise<WorkShowcase> {
     try {
-      const showcase = await this.workShowcaseModel.findById(id).exec();
+      const showcase = await this.workShowcaseModel.findOne({ _id: id, isActive: true }).exec();
       if (!showcase) {
         throw new NotFoundException(`Work showcase with ID "${id}" not found`);
       }
+
+      // 조회수 증가
+      await this.incrementViewCount(id);
+
       return showcase;
     } catch (error) {
       if (error instanceof NotFoundException) {
@@ -47,6 +72,38 @@ export class WorkShowcaseService {
       // TODO: Add logger
       throw new InternalServerErrorException(
         `작업 사례를 가져오는 중 오류가 발생했습니다: ${id}`,
+      );
+    }
+  }
+
+  async incrementViewCount(id: string): Promise<void> {
+    try {
+      await this.workShowcaseModel
+        .findByIdAndUpdate(id, { $inc: { viewCount: 1 } })
+        .exec();
+    } catch (error) {
+      // 조회수 증가 실패는 중요하지 않으므로 에러를 던지지 않음
+      console.error(`조회수 증가 실패: ${id}`, error);
+    }
+  }
+
+  async incrementLikeCount(id: string): Promise<{ likeCount: number }> {
+    try {
+      const workShowcase = await this.workShowcaseModel
+        .findByIdAndUpdate(id, { $inc: { likeCount: 1 } }, { new: true })
+        .exec();
+
+      if (!workShowcase) {
+        throw new NotFoundException(`작업자 자랑거리를 찾을 수 없습니다: ${id}`);
+      }
+
+      return { likeCount: workShowcase.likeCount };
+    } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
+      throw new InternalServerErrorException(
+        `좋아요 증가 중 오류가 발생했습니다: ${id}`,
       );
     }
   }

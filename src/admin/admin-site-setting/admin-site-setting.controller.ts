@@ -1,31 +1,33 @@
-import { Body, Controller, Get, Patch, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Patch,
+  Body,
+  UseGuards,
+  UseInterceptors,
+} from "@nestjs/common"
 
-import { Roles } from '../../common/decorator/roles.decorator';
-import { JwtAuthGuard } from '../../common/guard/jwt-auth.guard';
-import { RolesGuard } from '../../common/guard/roles.guard';
 
-import { AdminSiteSettingService } from './admin-site-setting.service';
+import { ApiResponseInterceptor } from "../../common/interceptor/api-response.interceptor"
+import { AdminAuthGuard } from "../../common/guard/admin-auth.guard"
 
-import { UserRole } from '../../schema/user.schema';
+import { AdminSiteSettingService } from "./admin-site-setting.service"
 
-import { SiteSettingResponseDto } from './dto/response/site-setting-response.dto';
-import { UpdateSiteSettingDto } from './dto/request/update-site-setting.dto';
+import { UpdateSiteSettingDto } from "./dto/request/update-site-setting-request.dto"
 
-@Controller('admin/site-setting')
-@UseGuards(JwtAuthGuard, RolesGuard)
-@Roles(UserRole.ADMIN)
+@Controller("admin/site-setting")
+@UseGuards(AdminAuthGuard)
+@UseInterceptors(ApiResponseInterceptor)
 export class AdminSiteSettingController {
-  constructor(private readonly siteSettingService: AdminSiteSettingService) {}
+  constructor(private readonly siteSettingService: AdminSiteSettingService) { }
 
   @Get()
-  async getSiteSettings(): Promise<SiteSettingResponseDto> {
-    return this.siteSettingService.getSiteSettings();
+  async getSiteSettings() {
+    return this.siteSettingService.findOrCreate()
   }
 
   @Patch()
-  async updateSiteSettings(
-    @Body() dto: UpdateSiteSettingDto,
-  ): Promise<SiteSettingResponseDto> {
-    return this.siteSettingService.updateSiteSettings(dto);
+  async updateSiteSettings(@Body() dto: UpdateSiteSettingDto) {
+    return this.siteSettingService.update(dto)
   }
 }

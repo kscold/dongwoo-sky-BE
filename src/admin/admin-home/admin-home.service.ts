@@ -1,22 +1,29 @@
 import {
   Injectable,
-  NotFoundException,
+  BadRequestException,
   ConflictException,
+  Logger,
+  HttpStatus,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { Home, HomeDocument } from '../../schema/home.schema';
+
 import { FileService } from '../../common/file/file.service';
+
+import { Home, HomeDocument } from '../../schema/home.schema';
+
 import { ApiResponseDto } from '../../common/dto/response/api-response.dto';
 import { AdminHomeResponseDto } from './dto/response/admin-home.response.dto';
 
 @Injectable()
 export class AdminHomeService {
+  private readonly logger = new Logger(AdminHomeService.name);
+
   constructor(
     @InjectModel(Home.name)
     private homeModel: Model<HomeDocument>,
     private fileService: FileService,
-  ) {}
+  ) { }
 
   // 메인 홈 데이터 조회 (Public API)
   async getMainHomeData(): Promise<ApiResponseDto<Home>> {
@@ -32,51 +39,40 @@ export class AdminHomeService {
         mainHome = await created.save();
       }
 
-      return new ApiResponseDto({ success: true, code: 200, data: mainHome });
+      return new ApiResponseDto({ success: true, code: HttpStatus.OK, data: mainHome });
     } catch (error) {
-      throw error;
+      this.logger.error(`[getMainHomeData] 메인 홈 데이터 조회 실패: ${error.message}`);
+      throw new BadRequestException(`[getMainHomeData] 메인 홈 데이터 조회 실패: ${error.message}`);
     }
   }
 
   // 기본 메인 홈 데이터
-  private getDefaultMainHomeData(): Partial<Home> {
-    return {
-      key: 'main',
-      title: '홈 설정',
-      description: '홈페이지에 대한 설명입니다.',
-      heroSection: {
-        title: '어울림 스카이',
-        subtitle: '안전하고 신뢰할 수 있는 중장비 렌탈 서비스',
-        description:
-          '최신 스카이 장비로 어떤 높이의 작업이든 신속하고 안전하게! 지금 바로 전문가와 상담하세요.',
-        ctaText: '무료 견적 문의',
-        ctaLink: '/contact',
-        backgroundImageUrl: '',
-        backgroundImages: [],
-        isActive: true,
-      },
-      contentSettings: [],
-      isActive: true,
-    };
+  private async getDefaultMainHomeData(): Promise<Partial<Home>> {
+    // 데이터베이스에서 현재 세팅 값을 실제로 받아옴
+    const home = await this.homeModel.findOne({ isActive: true }).lean().exec();
+
+    return home;
   }
 
-  private mapHomeToResponseDto(home: Home): AdminHomeResponseDto {
+  private mapHomeToResponseDto(home: HomeDocument): AdminHomeResponseDto {
+    const ctaButtons = home.heroSection?.ctaButtons || [];
     return {
+      _id: home._id?.toString(),
       pageId: home.key,
       heroTitle: {
         preTitle: home.heroSection?.title || '',
         mainTitle: home.heroSection?.subtitle || '',
         postTitle: home.heroSection?.description || '',
       },
-      heroSubtitle: home.heroSection?.ctaText || '',
-      heroImages: (home.heroSection?.backgroundImages || []).map(
-        (img) => img.url,
+      heroSubtitle: '', // 이 필드는 더 이상 사용되지 않음
+      heroImages: (home.heroSection?.backgroundImageUrls || []).map(
+        img => img.url,
       ),
       heroButtons: {
-        primaryButtonText: home.heroSection?.ctaText || '',
-        primaryButtonLink: home.heroSection?.ctaLink || '',
-        secondaryButtonText: '', // 필요시 확장
-        secondaryButtonLink: '', // 필요시 확장
+        primaryButtonText: ctaButtons[0]?.text || '',
+        primaryButtonLink: ctaButtons[0]?.link || '',
+        secondaryButtonText: ctaButtons[1]?.text || '',
+        secondaryButtonLink: ctaButtons[1]?.link || '',
       },
       isActive: home.isActive,
       sortOrder: (home as any).sortOrder ?? 0,
@@ -92,9 +88,10 @@ export class AdminHomeService {
         .lean()
         .exec();
       const data = homes.map((h) => this.mapHomeToResponseDto(h));
-      return new ApiResponseDto({ success: true, code: 200, data });
+      return new ApiResponseDto({ success: true, code: HttpStatus.OK, data });
     } catch (error) {
-      throw error;
+      this.logger.error(`[findAll] 홈 조회 실패: ${error.message}`);
+      throw new BadRequestException(`[findAll] 홈 조회 실패: ${error.message}`);
     }
   }
 
@@ -103,14 +100,15 @@ export class AdminHomeService {
     try {
       const home = await this.homeModel.findById(id).lean().exec();
       if (!home)
-        throw new NotFoundException(`홈을 찾을 수 없습니다. ID: ${id}`);
+        throw new BadRequestException(`홈을 찾을 수 없습니다. ID: ${id}`);
       return new ApiResponseDto({
         success: true,
-        code: 200,
+        code: HttpStatus.OK,
         data: this.mapHomeToResponseDto(home),
       });
     } catch (error) {
-      throw error;
+      this.logger.error(`[findOne] 홈 조회 실패: ${error.message}`);
+      throw new BadRequestException(`[findOne] 홈 조회 실패: ${error.message}`);
     }
   }
 
@@ -119,21 +117,59 @@ export class AdminHomeService {
     createHomeDto: any,
   ): Promise<ApiResponseDto<AdminHomeResponseDto>> {
     try {
+      this.logger.log('[create] 생성 요청 데이터:', createHomeDto);
+
+      // 프론트엔드 데이터를 백엔드 스키마에 맞게 변환
+      const transformedData = {
+        key: createHomeDto.pageId || 'main',
+        title: createHomeDto.heroTitle?.mainTitle || '홈 설정',
+        description: createHomeDto.heroSubtitle || '홈페이지에 대한 설명입니다.',
+        heroSection: {
+          title: createHomeDto.heroTitle?.preTitle || '',
+          companyName: createHomeDto.heroSection?.companyName || '어울림 스카이',
+          highlightText: createHomeDto.heroSection?.highlightText || '어울림 스카이',
+          subtitle: createHomeDto.heroTitle?.mainTitle || '',
+          description: createHomeDto.heroTitle?.postTitle || '',
+          ctaButtons: [
+            {
+              text: createHomeDto.heroButtons?.primaryButtonText || '',
+              link: createHomeDto.heroButtons?.primaryButtonLink || '',
+            },
+            {
+              text: createHomeDto.heroButtons?.secondaryButtonText || '',
+              link: createHomeDto.heroButtons?.secondaryButtonLink || '',
+            },
+          ],
+          backgroundImageUrls: (createHomeDto.heroImages || []).map(url =>
+            typeof url === 'string' ? { url, alt: '' } : url
+          ),
+          isActive: true,
+        },
+        isActive: createHomeDto.isActive !== false,
+      };
+
+      this.logger.log('[create] 변환된 데이터:', transformedData);
+
       // key 중복 확인
-      const existing = await this.homeModel.findOne({ key: createHomeDto.key });
+      const existing = await this.homeModel.findOne({ key: transformedData.key });
       if (existing)
         throw new ConflictException(
-          `이미 존재하는 key입니다: ${createHomeDto.key}`,
+          `이미 존재하는 key입니다: ${transformedData.key}`,
         );
-      const home = new this.homeModel(createHomeDto);
+
+      const home = new this.homeModel(transformedData);
       const saved = await home.save();
+
+      this.logger.log('[create] 저장된 데이터:', saved);
+
       return new ApiResponseDto({
         success: true,
-        code: 201,
+        code: HttpStatus.OK,
         data: this.mapHomeToResponseDto(saved),
       });
     } catch (error) {
-      throw error;
+      this.logger.error(`[create] 생성 실패: ${error.message}`);
+      throw new BadRequestException(`[create] 생성 실패: ${error.message}`);
     }
   }
 
@@ -143,18 +179,54 @@ export class AdminHomeService {
     updateHomeDto: any,
   ): Promise<ApiResponseDto<AdminHomeResponseDto>> {
     try {
+      this.logger.log('[update] 업데이트 요청 데이터:', updateHomeDto);
+
+      // 프론트엔드 데이터를 백엔드 스키마에 맞게 변환
+      const transformedData = {
+        key: updateHomeDto.pageId || 'main',
+        title: updateHomeDto.heroTitle?.mainTitle || '홈 설정',
+        description: updateHomeDto.heroSubtitle || '홈페이지에 대한 설명입니다.',
+        heroSection: {
+          title: updateHomeDto.heroTitle?.preTitle || '',
+          companyName: updateHomeDto.heroSection?.companyName || '어울림 스카이',
+          highlightText: updateHomeDto.heroSection?.highlightText || '어울림 스카이',
+          subtitle: updateHomeDto.heroTitle?.mainTitle || '',
+          description: updateHomeDto.heroTitle?.postTitle || '',
+          ctaButtons: [
+            {
+              text: updateHomeDto.heroButtons?.primaryButtonText || '',
+              link: updateHomeDto.heroButtons?.primaryButtonLink || '',
+            },
+            {
+              text: updateHomeDto.heroButtons?.secondaryButtonText || '',
+              link: updateHomeDto.heroButtons?.secondaryButtonLink || '',
+            },
+          ],
+          backgroundImageUrls: (updateHomeDto.heroImages || []).map(url =>
+            typeof url === 'string' ? { url, alt: '' } : url
+          ),
+          isActive: true,
+        },
+        isActive: updateHomeDto.isActive !== false,
+      };
+
+      this.logger.log('[update] 변환된 업데이트 데이터:', transformedData);
+
       const updated = await this.homeModel
-        .findByIdAndUpdate(id, updateHomeDto, { new: true })
-        .lean()
+        .findByIdAndUpdate(id, transformedData, { new: true })
         .exec();
       if (!updated)
-        throw new NotFoundException(`홈을 찾을 수 없습니다. ID: ${id}`);
+        throw new BadRequestException(`홈을 찾을 수 없습니다. ID: ${id}`);
+
+      this.logger.log('[update] 업데이트된 데이터:', updated);
+
       return new ApiResponseDto({
         success: true,
-        code: 200,
+        code: HttpStatus.OK,
         data: this.mapHomeToResponseDto(updated),
       });
     } catch (error) {
+      this.logger.error('[update] 업데이트 실패:', error);
       throw error;
     }
   }
@@ -164,10 +236,11 @@ export class AdminHomeService {
     try {
       const result = await this.homeModel.findByIdAndDelete(id).exec();
       if (!result)
-        throw new NotFoundException(`홈을 찾을 수 없습니다. ID: ${id}`);
-      return new ApiResponseDto({ success: true, code: 200 });
+        throw new BadRequestException(`홈을 찾을 수 없습니다. ID: ${id}`);
+      return new ApiResponseDto({ success: true, code: HttpStatus.OK });
     } catch (error) {
-      throw error;
+      this.logger.error(`[remove] 홈 삭제 실패: ${error.message}`);
+      throw new BadRequestException(`[remove] 홈 삭제 실패: ${error.message}`);
     }
   }
 
@@ -175,14 +248,17 @@ export class AdminHomeService {
   async ensureMainHomeExists(): Promise<ApiResponseDto<Home>> {
     try {
       let mainHome = await this.homeModel.findOne({ isActive: true }).exec();
+
       if (mainHome)
-        return new ApiResponseDto({ success: true, code: 200, data: mainHome });
+        return new ApiResponseDto({ success: true, code: HttpStatus.OK, data: mainHome });
+
       const defaultData = this.getDefaultMainHomeData();
       const created = new this.homeModel(defaultData);
       mainHome = await created.save();
-      return new ApiResponseDto({ success: true, code: 201, data: mainHome });
+      return new ApiResponseDto({ success: true, code: HttpStatus.OK, data: mainHome });
     } catch (error) {
-      throw error;
+      this.logger.error(`[ensureMainHomeExists] 홈을 찾을 수 없습니다. ID: ${error.message}`);
+      throw new BadRequestException(`[ensureMainHomeExists] 홈을 찾을 수 없습니다. ID: ${error.message}`);
     }
   }
 
@@ -194,32 +270,18 @@ export class AdminHomeService {
       // 공통 파일 업로드 로직 사용 (FileService)
       const heroImage = await this.fileService.uploadImageAsHeroImage(
         file,
-        'landing-page/hero-images',
+        'home/hero-images',
       );
 
-      // 업로드된 이미지를 메인 페이지의 backgroundImages에 추가
-      const mainPage = await this.homeModel.findOne({ isActive: true }).exec();
-      if (mainPage) {
-        const images = Array.isArray(mainPage.heroSection.backgroundImages)
-          ? mainPage.heroSection.backgroundImages
-          : [];
-        images.push(heroImage);
-        await this.homeModel.findByIdAndUpdate(mainPage._id, {
-          'heroSection.backgroundImages': images,
-        });
-      }
-
+      // 단순히 업로드된 이미지 정보만 반환 (DB 저장은 별도 저장 API에서 처리)
       return new ApiResponseDto({
         success: true,
-        code: 201,
+        code: HttpStatus.OK,
         data: { image: heroImage },
       });
     } catch (error) {
-      return new ApiResponseDto({
-        success: false,
-        code: 400,
-        error: error.message,
-      });
+      this.logger.error(`[uploadHeroImage] 히어로 이미지 업로드 실패: ${error.message}`);
+      throw new BadRequestException(`[uploadHeroImage] 히어로 이미지 업로드 실패: ${error.message}`);
     }
   }
 
@@ -231,32 +293,18 @@ export class AdminHomeService {
       // 공통 파일 업로드 로직 사용 (FileService)
       const heroImages = await this.fileService.uploadImagesAsHeroImages(
         files,
-        'landing-page/hero-images',
+        'home/hero-images',
       );
 
-      // 업로드된 이미지들을 메인 페이지의 backgroundImages에 추가
-      const mainPage = await this.homeModel.findOne({ isActive: true }).exec();
-      if (mainPage) {
-        const images = Array.isArray(mainPage.heroSection.backgroundImages)
-          ? mainPage.heroSection.backgroundImages
-          : [];
-        heroImages.forEach((img) => images.push(img));
-        await this.homeModel.findByIdAndUpdate(mainPage._id, {
-          'heroSection.backgroundImages': images,
-        });
-      }
-
+      // 단순히 업로드된 이미지 정보만 반환 (DB 저장은 별도 저장 API에서 처리)
       return new ApiResponseDto({
         success: true,
-        code: 201,
+        code: HttpStatus.OK,
         data: { images: heroImages },
       });
     } catch (error) {
-      return new ApiResponseDto({
-        success: false,
-        code: 400,
-        error: error.message,
-      });
+      this.logger.error(`[uploadHeroImages] 히어로 이미지 업로드 실패: ${error.message}`);
+      throw new BadRequestException(`[uploadHeroImages] 히어로 이미지 업로드 실패: ${error.message}`);
     }
   }
 
@@ -269,46 +317,11 @@ export class AdminHomeService {
     if (
       mainPage &&
       mainPage.heroSection &&
-      Array.isArray(mainPage.heroSection.backgroundImages)
+      Array.isArray(mainPage.heroSection.backgroundImageUrls)
     ) {
-      images = mainPage.heroSection.backgroundImages.map((img) => img.url);
+      images = mainPage.heroSection.backgroundImageUrls.map((img) => img.url);
     }
     return { images };
-  }
-
-  // 선택된 이미지를 메인 배경으로 설정
-  async setHeroImage(imageUrl: string): Promise<ApiResponseDto<Home>> {
-    try {
-      const mainPageRes = await this.getMainHomeData();
-      const mainPage = mainPageRes.data;
-      if (!mainPage)
-        throw new NotFoundException('메인 홈 데이터를 찾을 수 없습니다.');
-      const heroImages = mainPage.heroSection.backgroundImages || [];
-      // 해당 url을 가진 HeroImage가 있는지 확인
-      const found = heroImages.find((img) => img.url === imageUrl);
-      if (!found)
-        throw new NotFoundException('해당 이미지를 찾을 수 없습니다.');
-      // backgroundImageUrl만 변경
-      const updateData = {
-        heroSection: {
-          ...mainPage.heroSection,
-          backgroundImageUrl: imageUrl,
-        },
-      };
-      const updatedPage = await this.homeModel
-        .findByIdAndUpdate((mainPage as any)._id, updateData, { new: true })
-        .lean()
-        .exec();
-      if (!updatedPage)
-        throw new NotFoundException('랜딩 페이지 업데이트에 실패했습니다.');
-      return new ApiResponseDto({
-        success: true,
-        code: 200,
-        data: updatedPage,
-      });
-    } catch (error) {
-      throw error;
-    }
   }
 
   // 히어로 이미지 삭제
@@ -319,23 +332,13 @@ export class AdminHomeService {
       const mainPageRes = await this.getMainHomeData();
       const mainPage = mainPageRes.data;
       if (!mainPage)
-        throw new NotFoundException('메인 홈 데이터를 찾을 수 없습니다.');
-      const heroImages = mainPage.heroSection.backgroundImages || [];
+        throw new BadRequestException('메인 홈 데이터를 찾을 수 없습니다.');
+      const heroImages = mainPage.heroSection.backgroundImageUrls || [];
       // 삭제 대상 HeroImage 찾기
       const updatedImages = heroImages.filter((img) => img.url !== imageUrl);
-      // 삭제된 이미지가 현재 메인 배경인 경우, 다른 이미지로 변경
-      let newBackgroundUrl = mainPage.heroSection.backgroundImageUrl;
-      if (newBackgroundUrl === imageUrl) {
-        newBackgroundUrl =
-          updatedImages[0]?.url ||
-          'https://images.unsplash.com/photo-1506784983877-45594efa4c88?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D';
-      }
+
       const updateData = {
-        heroSection: {
-          ...mainPage.heroSection,
-          backgroundImageUrl: newBackgroundUrl,
-          backgroundImages: updatedImages,
-        },
+        'heroSection.backgroundImageUrls': updatedImages,
       };
       await this.homeModel
         .findByIdAndUpdate((mainPage as any)._id, updateData, { new: true })
@@ -346,7 +349,7 @@ export class AdminHomeService {
           imageUrl.includes('cloudfront.net') ||
           imageUrl.includes('amazonaws.com')
         ) {
-          const matches = imageUrl.match(/landing-page\/hero-images\/[^?]+/);
+          const matches = imageUrl.match(/home\/hero-images\/[^?]+/);
           if (matches) {
             const key = matches[0];
             await this.fileService.deleteFile(key);
@@ -357,11 +360,12 @@ export class AdminHomeService {
       }
       return new ApiResponseDto({
         success: true,
-        code: 200,
+        code: HttpStatus.OK,
         data: { message: '이미지가 성공적으로 삭제되었습니다.' },
       });
     } catch (error) {
-      throw error;
+      this.logger.error(`[deleteHeroImage] 히어로 이미지 삭제 실패: ${error.message}`);
+      throw new BadRequestException(`[deleteHeroImage] 히어로 이미지 삭제 실패: ${error.message}`);
     }
   }
 }

@@ -6,7 +6,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcrypt';
 import { User, UserDocument } from '../../schema/user.schema';
 import { UserCreateRequestDto } from './dto/request/user-create-request.dto';
 
@@ -14,7 +14,7 @@ import { UserCreateRequestDto } from './dto/request/user-create-request.dto';
 export class UserService {
   private readonly logger = new Logger(UserService.name);
 
-  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) {}
+  constructor(@InjectModel(User.name) private userModel: Model<UserDocument>) { }
 
   async register(dto: UserCreateRequestDto): Promise<UserDocument> {
     try {

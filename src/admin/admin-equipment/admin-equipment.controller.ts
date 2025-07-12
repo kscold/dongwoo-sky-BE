@@ -20,9 +20,9 @@ import { AdminAuthGuard } from '../../common/guard/admin-auth.guard';
 import { EquipmentService } from './admin-equipment.service';
 import { FileService } from '../../common/file/file.service';
 
-import { AdminEquipmentCreateDto } from './dto/request/admin-equipment-create.dto';
-import { AdminEquipmentUpdateDto } from './dto/request/admin-equipment-update.dto';
-import { AdminEquipmentResponseDto } from './dto/response/admin-equipment.response.dto';
+import { AdminEquipmentCreateRequestDto } from './dto/request/admin-equipment-create-request.dto';
+import { AdminEquipmentUpdateRequestDto } from './dto/request/admin-equipment-update-request.dto';
+import { AdminEquipmentResponseDto } from './dto/response/admin-equipment-response.dto';
 
 @Controller('admin/equipment')
 export class EquipmentController {
@@ -33,30 +33,26 @@ export class EquipmentController {
 
   @Get()
   async findAll(): Promise<AdminEquipmentResponseDto[]> {
-    const result = await this.equipmentService.findAll();
-    return result.data;
+    return this.equipmentService.findAll();
   }
 
   @Get('admin')
   @UseGuards(AdminAuthGuard)
   async findAllAdmin(): Promise<AdminEquipmentResponseDto[]> {
-    const result = await this.equipmentService.findAllAdmin();
-    return result.data;
+    return this.equipmentService.findAllAdmin();
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string): Promise<AdminEquipmentResponseDto> {
-    const result = await this.equipmentService.findOne(id);
-    return result.data;
+    return this.equipmentService.findOne(id);
   }
 
   @Post()
   @UseGuards(AdminAuthGuard)
   async create(
-    @Body() createEquipmentDto: AdminEquipmentCreateDto,
+    @Body() createEquipmentDto: AdminEquipmentCreateRequestDto,
   ): Promise<AdminEquipmentResponseDto> {
-    const result = await this.equipmentService.create(createEquipmentDto);
-    return result.data;
+    return this.equipmentService.create(createEquipmentDto);
   }
 
   @Post('upload-image')
@@ -85,13 +81,12 @@ export class EquipmentController {
   @UseGuards(AdminAuthGuard)
   async update(
     @Param('id') id: string,
-    @Body() updateEquipmentDto: AdminEquipmentUpdateDto,
+    @Body() updateEquipmentDto: AdminEquipmentUpdateRequestDto,
   ): Promise<AdminEquipmentResponseDto> {
-    const result = await this.equipmentService.update(id, updateEquipmentDto);
-    return result.data;
+    return this.equipmentService.update(id, updateEquipmentDto);
   }
 
-  @Put('sort-order')
+  @Patch('sort-order')
   @UseGuards(AdminAuthGuard)
   async updateSortOrder(@Body() { equipmentIds }: { equipmentIds: string[] }) {
     return this.equipmentService.updateSortOrder(equipmentIds);

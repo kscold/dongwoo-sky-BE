@@ -35,18 +35,41 @@ export class Equipment {
   @Prop()
   maxWeight?: string;
 
+  @Prop([String])
+  capabilities?: string[];
+
   @Prop()
   iconUrl?: string;
 
-  @Prop([String])
-  priceRanges?: string[];
+  @Prop({ default: true })
+  isPublished: boolean;
 
-  // 서비스별 노출 여부
   @Prop({ default: false })
   showInService: boolean;
 
   @Prop({ default: false })
   showInPricing: boolean;
+
+  @Prop({ type: [String], default: [] })
+  priceRanges?: string[];
+
+  @Prop({ type: Number })
+  basePrice?: number;
+
+  @Prop({ type: Number })
+  hourlyRate?: number;
+
+  @Prop({ type: Number, default: 4 })
+  baseHours?: number;
+
+  @Prop({ type: Number, default: 1 })
+  minHours?: number;
+
+  @Prop({ type: Number, default: 12 })
+  maxHours?: number;
+
+  @Prop({ type: [String], default: [] })
+  workingTimeRanges?: string[];
 }
 
 export const EquipmentSchema = SchemaFactory.createForClass(Equipment);

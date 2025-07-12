@@ -2,13 +2,13 @@ import {
   Injectable,
   ConflictException,
   NotFoundException,
-  UnauthorizedException,
   BadRequestException,
   Logger,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 
 import { User, UserDocument, UserRole } from '../../schema/user.schema';
@@ -21,10 +21,10 @@ import { AdminUpdateUserRequestDto } from './dto/request/admin-user-update-reque
 export class AdminUserService {
   private readonly logger = new Logger(AdminUserService.name);
 
-    constructor(
+  constructor(
     @InjectModel(User.name) private userModel: Model<UserDocument>,
     private jwtService: JwtService,
-  ) {}
+  ) { }
 
   async findByEmail(email: string): Promise<UserDocument | null> {
     try {
@@ -37,18 +37,21 @@ export class AdminUserService {
     }
   }
 
-  async validateUser(email: string, password: string): Promise<UserDocument> {
-    try {
-      const user = await this.findByEmail(email);
-      if (user && (await bcrypt.compare(password, user.password))) {
-        const { password, ...result } = user.toObject();
-        return result as UserDocument;
-      }
-      return null;
-    } catch (error) {
-      this.logger.error(`[validateUser] ${error.message}`, error.stack);
-      throw new BadRequestException('사용자 검증 중 오류가 발생했습니다.');
+  async validateUser(email: string, pass: string): Promise<any> {
+    const user = await this.userModel.findOne({ email }).select('+password');
+    if (!user) {
+      this.logger.warn(`[validateUser] User not found: ${email}`);
+      throw new UnauthorizedException('이메일 또는 비밀번호가 올바르지 않습니다.');
     }
+
+    const isPasswordMatching = await bcrypt.compare(pass, user.password);
+    if (user && isPasswordMatching) {
+      const { password, ...result } = user.toObject();
+      return result;
+    }
+
+    this.logger.warn(`[validateUser] Invalid password for user: ${email}`);
+    throw new UnauthorizedException('이메일 또는 비밀번호가 올바르지 않습니다.');
   }
 
   async updateLastLogin(id: string): Promise<void> {
@@ -106,34 +109,22 @@ export class AdminUserService {
   async createUserByAdmin(
     dto: AdminUserCreateRequestDto,
   ): Promise<UserDocument> {
-    try {
-      const existingUser = await this.userModel.findOne({ email: dto.email });
-      if (existingUser) {
-        throw new ConflictException('이미 존재하는 이메일입니다.');
-      }
-
-      const hashedPassword = await bcrypt.hash(dto.password, 10);
-
-      const user = new this.userModel({
-        ...dto,
-        password: hashedPassword,
-        isApproved: true,
-      });
-
-      const savedUser = await user.save();
-      const result = savedUser.toObject();
-      delete result.password;
-
-      return result as UserDocument;
-    } catch (error) {
-      this.logger.error(`[createUserByAdmin] ${error.message}`, error.stack);
-      if (error instanceof ConflictException) {
-        throw error;
-      }
-      throw new BadRequestException(
-        '관리자에 의한 사용자 생성 중 오류가 발생했습니다.',
-      );
+    const { email, password, ...rest } = dto;
+    const existingUser = await this.userModel.findOne({ email });
+    if (existingUser) {
+      throw new ConflictException('이미 사용중인 이메일입니다.');
     }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = new this.userModel({
+      ...rest,
+      email,
+      password: hashedPassword,
+      isApproved: true,
+    });
+
+    return newUser.save();
   }
 
   async getUserById(id: string): Promise<UserDocument> {
@@ -220,25 +211,28 @@ export class AdminUserService {
     }
   }
 
-  async register(registerDto: AdminUserCreateRequestDto, role: UserRole) {
-    try {
-      const user = await this.createUserByAdmin({
-        ...registerDto,
-        role: role, 
-      });
-
-      const { password, ...result } = user as any;
-      return {
-        success: true,
-        user: result,
-        message: '회원가입이 완료되었습니다.',
-      };
-    } catch (error) {
-      this.logger.error(`[register] ${error.message}`, error.stack);
-      if (error instanceof ConflictException) {
-        throw new BadRequestException('이미 가입된 이메일입니다.');
-      }
-      throw new BadRequestException('회원가입 중 오류가 발생했습니다.');
+  async register(
+    registerDto: AdminUserCreateRequestDto,
+    role: UserRole,
+  ): Promise<any> {
+    const { email, password, ...rest } = registerDto;
+    const existingUser = await this.userModel.findOne({ email });
+    if (existingUser) {
+      throw new ConflictException('이미 사용중인 이메일입니다.');
     }
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = new this.userModel({
+      ...rest,
+      email,
+      password: hashedPassword,
+      role,
+      isApproved: true,
+    });
+
+    const savedUser = await newUser.save();
+    const result = savedUser.toObject();
+    delete result.password;
+
+    return result;
   }
 }

@@ -1,13 +1,14 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, UseInterceptors } from '@nestjs/common';
 import { ServiceGuideService } from './service-guide.service';
-import { Equipment } from 'src/schema/equipment.schema';
+import { ApiResponseInterceptor } from 'src/common/interceptor/api-response.interceptor';
 
 @Controller('service/service-guide')
+@UseInterceptors(ApiResponseInterceptor)
 export class ServiceGuideController {
-  constructor(private readonly serviceGuideService: ServiceGuideService) {}
+  constructor(private readonly serviceGuideService: ServiceGuideService) { }
 
   @Get()
-  async getEquipmentsForServiceGuide(): Promise<Equipment[]> {
-    return this.serviceGuideService.getEquipmentsForServiceGuide();
+  async getServiceGuidePage() {
+    return this.serviceGuideService.getServiceGuidePageData();
   }
 }
