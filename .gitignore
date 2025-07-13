@@ -68,3 +68,4 @@ credentials
 # Serverless deployment artifacts
 .serverless_plugins/
 serverless_sdk/
+layer/
