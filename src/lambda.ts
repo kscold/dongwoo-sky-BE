@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { ExpressAdapter } from '@nestjs/platform-express';
 import { Handler, Context } from 'aws-lambda';
-import express from 'express';
+import * as express from 'express';
 
 import { AppModule } from './app.module';
 

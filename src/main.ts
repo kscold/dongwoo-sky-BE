@@ -11,9 +11,14 @@ async function bootstrap() {
   });
 
   app.enableCors({
-    origin: '*',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    allowedHeaders: 'Content-Type, Authorization',
+    origin: [
+      'http://localhost:3000',
+      'https://dongwoo-sky.vercel.app',
+      'https://*.vercel.app'
+    ],
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
+    allowedHeaders: 'Content-Type, Authorization, Accept, X-Requested-With, KakaoAK',
+    credentials: true,
   });
 
   // 파일 업로드를 위한 Express 설정

@@ -34,7 +34,15 @@ functions:
       - http:
           method: any
           path: /{proxy+}
-          cors: true
+          cors:
+            origin: "*"
+            headers:
+              - Content-Type
+              - Authorization
+              - Accept
+              - X-Requested-With
+              - KakaoAK
+            allowCredentials: true
 
 package:
   individually: false
