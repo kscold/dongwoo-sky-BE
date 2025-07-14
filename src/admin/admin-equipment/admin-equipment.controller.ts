@@ -9,7 +9,6 @@ import {
   UseInterceptors,
   UploadedFile,
   UseGuards,
-  Put,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 
@@ -59,22 +58,7 @@ export class EquipmentController {
   @UseGuards(AdminAuthGuard)
   @UseInterceptors(FileInterceptor('file', fileUploadOptions))
   async uploadImage(@UploadedFile() file: Express.Multer.File) {
-    // 단일 파일만 허용
-    return this.fileService.uploadFile(file, 'equipment', {
-      compressImage: true,
-      imageOptions: { quality: 85, width: 1920 },
-      allowedExtensions: [
-        'jpg',
-        'jpeg',
-        'png',
-        'gif',
-        'webp',
-        'heic',
-        'heif',
-        'avif',
-      ],
-      maxSize: 15 * 1024 * 1024,
-    });
+    return this.equipmentService.uploadImage(file);
   }
 
   @Patch(':id')

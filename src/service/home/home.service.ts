@@ -33,9 +33,11 @@ export class HomeService {
   ) { }
 
   private async findOrCreateHome(): Promise<HomeDocument> {
-    let home = await this.homeModel.findOne({ key: "main" }).exec()
+    this.logger.log('[findOrCreateHome] 홈 정보 조회 또는 생성 시작');
+    try {
+      let home = await this.homeModel.findOne({ key: "main" }).exec()
 
-    const defaultHomeContent = {
+      const defaultHomeContent = {
       key: "main",
       title: "홈 설정",
       description: "홈페이지에 대한 설명입니다.",
@@ -83,14 +85,22 @@ export class HomeService {
       home.heroSection = defaultHomeContent.heroSection
       home.contentSettings = defaultHomeContent.contentSettings
       await home.save()
+      this.logger.log('[findOrCreateHome] 기본 홈 정보 생성 완료');
     }
 
+    this.logger.log('[findOrCreateHome] 홈 정보 조회 또는 생성 성공');
     return home
+    } catch (e) {
+      this.logger.error('[findOrCreateHome] 홈 정보 조회 또는 생성 실패', e.stack);
+      throw new InternalServerErrorException(e.message);
+    }
   }
 
   async getHomePageData() {
-    const [home, notices, workShowcases, customerReviews, contactInfo] =
-      await Promise.all([
+    this.logger.log('[getHomePageData] 홈페이지 데이터 조회 시작');
+    try {
+      const [home, notices, workShowcases, customerReviews, contactInfo] =
+        await Promise.all([
         this.findOrCreateHome(),
         this.noticeModel
           .find({ isPublished: true })
@@ -111,12 +121,17 @@ export class HomeService {
         this.siteSettingService.getContactInfo(),
       ])
 
-    return {
-      home,
-      notices,
-      workShowcases,
-      customerReviews,
-      contactInfo,
+      this.logger.log('[getHomePageData] 홈페이지 데이터 조회 성공');
+      return {
+        home,
+        notices,
+        workShowcases,
+        customerReviews,
+        contactInfo,
+      }
+    } catch (e) {
+      this.logger.error('[getHomePageData] 홈페이지 데이터 조회 실패', e.stack);
+      throw new InternalServerErrorException(e.message);
     }
   }
 }

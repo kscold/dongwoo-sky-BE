@@ -3,6 +3,15 @@ import { S3Service } from './s3.service';
 import { FileToWebpService } from './file-to-webp.service';
 import { HeroImage } from '../../schema/home.schema';
 import { fileUploadOptions, allowedMimes } from '../config/file-upload.config';
+import { 
+  ALLOWED_IMAGE_EXTENSIONS, 
+  ALLOWED_DOCUMENT_EXTENSIONS, 
+  ALLOWED_ALL_EXTENSIONS,
+  FILE_SIZE_LIMITS,
+  IMAGE_COMPRESSION_OPTIONS,
+  UPLOAD_FOLDERS 
+} from '../constants/file.constants';
+import { ERROR_MESSAGES } from '../constants/error-messages.constants';
 
 @Injectable()
 export class FileService {
@@ -19,20 +28,10 @@ export class FileService {
    */
   validateFileExtension(
     filename: string,
-    allowedExtensions: string[] = [
-      'jpg',
-      'jpeg',
-      'png',
-      'gif',
-      'pdf',
-      'doc',
-      'docx',
-      'xls',
-      'xlsx',
-    ],
+    allowedExtensions: readonly string[] = ALLOWED_ALL_EXTENSIONS,
   ): boolean {
-    const ext = filename.split('.').pop().toLowerCase();
-    return allowedExtensions.includes(ext);
+    const ext = filename.split('.').pop()?.toLowerCase();
+    return ext ? allowedExtensions.includes(ext) : false;
   }
 
   /**
@@ -43,7 +42,7 @@ export class FileService {
    */
   validateFileSize(
     fileSize: number,
-    maxSize: number = 10 * 1024 * 1024,
+    maxSize: number = FILE_SIZE_LIMITS.DEFAULT,
   ): boolean {
     return fileSize <= maxSize;
   }
@@ -75,37 +74,27 @@ export class FileService {
   }> {
     // 파일이 없는 경우
     if (!file) {
-      throw new BadRequestException('파일이 제공되지 않았습니다.');
+      throw new BadRequestException(ERROR_MESSAGES.FILE_NOT_PROVIDED);
     }
 
     // 파일 버퍼 검증
     if (!file.buffer || file.buffer.length === 0) {
-      throw new BadRequestException('파일 데이터가 비어있습니다.');
+      throw new BadRequestException(ERROR_MESSAGES.FILE_EMPTY);
     }
 
     // 파일 확장자 검사
-    const allowedExtensions = options?.allowedExtensions || [
-      'jpg',
-      'jpeg',
-      'png',
-      'gif',
-      'pdf',
-      'doc',
-      'docx',
-      'xls',
-      'xlsx',
-    ];
+    const allowedExtensions = options?.allowedExtensions || [...ALLOWED_ALL_EXTENSIONS];
     if (!this.validateFileExtension(file.originalname, allowedExtensions)) {
       throw new BadRequestException(
-        `허용되지 않은 파일 형식입니다. 허용된 형식: ${allowedExtensions.join(', ')}`,
+        ERROR_MESSAGES.FILE_INVALID_EXTENSION(allowedExtensions),
       );
     }
 
     // 파일 크기 검사
-    const maxSize = options?.maxSize || 10 * 1024 * 1024; // 기본 10MB
+    const maxSize = options?.maxSize || FILE_SIZE_LIMITS.DEFAULT;
     if (!this.validateFileSize(file.size, maxSize)) {
       throw new BadRequestException(
-        `파일 크기가 제한을 초과합니다. 최대 ${maxSize / (1024 * 1024)}MB까지 허용됩니다.`,
+        ERROR_MESSAGES.FILE_SIZE_EXCEEDED(maxSize),
       );
     }
 
@@ -130,9 +119,9 @@ export class FileService {
         const webpBuffer = await this.FileToWebpService.convertToWebp(
           file.buffer,
           {
-            quality: options?.imageOptions?.quality || 80,
-            width: options?.imageOptions?.width,
-            height: options?.imageOptions?.height,
+            quality: options?.imageOptions?.quality || IMAGE_COMPRESSION_OPTIONS.QUALITY,
+            width: options?.imageOptions?.width || IMAGE_COMPRESSION_OPTIONS.MAX_WIDTH,
+            height: options?.imageOptions?.height || IMAGE_COMPRESSION_OPTIONS.MAX_HEIGHT,
           },
         );
 
@@ -204,20 +193,11 @@ export class FileService {
     const uploadResult = await this.uploadFile(file, folder, {
       compressImage: true,
       imageOptions: {
-        quality: 85,
-        width: 1920,
+        quality: IMAGE_COMPRESSION_OPTIONS.QUALITY,
+        width: IMAGE_COMPRESSION_OPTIONS.MAX_WIDTH,
       },
-      allowedExtensions: [
-        'jpg',
-        'jpeg',
-        'png',
-        'gif',
-        'webp',
-        'heic',
-        'heif',
-        'avif',
-      ],
-      maxSize: 15 * 1024 * 1024,
+      allowedExtensions: [...ALLOWED_IMAGE_EXTENSIONS],
+      maxSize: FILE_SIZE_LIMITS.IMAGE,
     });
     // CloudFront URL 반환 (uploadResult.url)
     return {
@@ -255,7 +235,7 @@ export class FileService {
    */
   async deleteFile(key: string): Promise<void> {
     if (!key) {
-      throw new BadRequestException('삭제할 파일 키가 제공되지 않았습니다.');
+      throw new BadRequestException(ERROR_MESSAGES.FILE_DELETE_KEY_MISSING);
     }
 
     await this.s3Service.deleteFile(key);

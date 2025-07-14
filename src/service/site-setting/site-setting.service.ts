@@ -59,9 +59,9 @@ export class SiteSettingService {
     async getSeoSettings(): Promise<SeoSettingsResponseDto> {
         const settings = await this.findOrCreate()
         return {
-            metaTitle: settings.metaTitle,
-            metaDescription: settings.metaDescription,
-            metaKeywords: settings.metaKeywords,
+            seoTitle: settings.metaTitle,
+            seoDescription: settings.metaDescription,
+            seoKeywords: settings.metaKeywords ? settings.metaKeywords.split(',').map(k => k.trim()) : [],
         }
     }
 

@@ -1,14 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { ImageInfo } from '../common/dto/file.dto';
 
-// 히어로 이미지 인터페이스
-export interface HeroImage {
-  url: string;
-  key: string;
-  name: string;
-  order: number;
-  isActive: boolean;
-}
+// HeroImage는 ImageInfo 타입으로 대체
+type HeroImage = ImageInfo;
+
+// Re-export HeroImage for backward compatibility
+export type { HeroImage };
 
 @Schema({ _id: false })
 export class HeroButton {

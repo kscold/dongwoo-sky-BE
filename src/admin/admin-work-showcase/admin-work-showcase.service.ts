@@ -11,7 +11,7 @@ import {
 } from '../../schema/work-showcase.schema';
 import { AdminWorkShowcaseCreateRequestDto } from './dto/request/admin-work-showcase-create-request.dto';
 import { AdminWorkShowcaseUpdateRequestDto } from './dto/request/admin-work-showcase-update-request.dto.dto';
-import { PaginatedWorkShowcases } from './dto/response/admin-work-showcase-list-response.dto';
+import { PaginatedResponse } from '../../common/dto/common.dto';
 
 @Injectable()
 export class AdminWorkShowcaseService {
@@ -35,7 +35,7 @@ export class AdminWorkShowcaseService {
         }
     }
 
-    async findAll(page: number = 1, limit: number = 10): Promise<PaginatedWorkShowcases> {
+    async findAll(page: number = 1, limit: number = 10): Promise<PaginatedResponse<WorkShowcaseDocument>> {
         try {
             const skip = (page - 1) * limit;
 

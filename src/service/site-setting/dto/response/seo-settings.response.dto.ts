@@ -1,5 +1,5 @@
 export class SeoSettingsResponseDto {
-    metaTitle: string
-    metaDescription: string
-    metaKeywords: string
+    seoTitle: string;
+    seoDescription: string;
+    seoKeywords: string[];
 } 

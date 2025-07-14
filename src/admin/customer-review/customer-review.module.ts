@@ -1,20 +1,9 @@
 import { Module } from '@nestjs/common';
-import { MongooseModule } from '@nestjs/mongoose';
-import { CustomerReviewService } from './customer-review.service';
 import { CustomerReviewController } from './customer-review.controller';
-import {
-  CustomerReview,
-  CustomerReviewSchema,
-} from '../../schema/customer-review.schema';
+import { CommonServiceModule } from '../../common/service/common-service.module';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([
-      { name: CustomerReview.name, schema: CustomerReviewSchema },
-    ]),
-  ],
+  imports: [CommonServiceModule],
   controllers: [CustomerReviewController],
-  providers: [CustomerReviewService],
-  exports: [CustomerReviewService],
 })
 export class CustomerReviewModule {}

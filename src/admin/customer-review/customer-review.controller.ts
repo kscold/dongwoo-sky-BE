@@ -13,10 +13,11 @@ import {
   UploadedFiles,
 } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { CustomerReviewService } from './customer-review.service';
+import { CustomerReviewService } from '../../common/service/customer-review.service';
 import { CreateCustomerReviewDto } from './dto/create-customer-review.dto';
 import { UpdateCustomerReviewDto } from './dto/update-customer-review.dto';
 import { AuthGuard } from '@nestjs/passport';
+import { PaginationUtil } from '../../common/utils/pagination.util';
 
 @Controller('admin/customer-review')
 @UseGuards(AuthGuard('jwt'))
@@ -25,37 +26,32 @@ export class CustomerReviewController {
 
   @Post()
   create(@Body() createCustomerReviewDto: CreateCustomerReviewDto) {
-    return this.customerReviewService.create(createCustomerReviewDto);
+    return this.customerReviewService.createReview(createCustomerReviewDto);
   }
 
   @Get()
-  findAll(
+  async findAll(
     @Query('page') page: string = '1',
     @Query('limit') limit: string = '10',
   ) {
-    const pageNumber = parseInt(page, 10);
-    const limitNumber = parseInt(limit, 10);
-    
-    return this.customerReviewService.findAll(pageNumber, limitNumber);
+    const { page: pageNumber, limit: limitNumber } = PaginationUtil.validatePaginationParams(page, limit);
+    const result = await this.customerReviewService.findAllForAdmin(pageNumber, limitNumber);
+    return PaginationUtil.toLegacyFormat(result);
   }
 
   @Get(':id')
   async findOne(@Param('id') id: string) {
-    const review = await this.customerReviewService.findOne(id);
-    if (!review) {
-      throw new NotFoundException(`Customer review with ID "${id}" not found`);
-    }
-    return review;
+    return this.customerReviewService.findOneForAdmin(id);
   }
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateCustomerReviewDto: UpdateCustomerReviewDto) {
-    return this.customerReviewService.update(id, updateCustomerReviewDto);
+    return this.customerReviewService.updateReview(id, updateCustomerReviewDto);
   }
 
   @Delete(':id')
   remove(@Param('id') id: string) {
-    return this.customerReviewService.remove(id);
+    return this.customerReviewService.removeReview(id);
   }
 
   @Patch(':id/toggle')

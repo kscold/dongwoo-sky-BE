@@ -1,13 +1,11 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
+import { UserRole } from '../admin/admin-user/dto/request/auth-request.dto';
 
 export type UserDocument = User & Document;
 
-export enum UserRole {
-  ADMIN = 'admin',
-  WORKER = 'worker',
-  CUSTOMER = 'customer',
-}
+// Re-export UserRole for backward compatibility
+export { UserRole };
 
 @Schema({
   timestamps: true,

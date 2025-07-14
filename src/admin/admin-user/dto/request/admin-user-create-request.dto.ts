@@ -1,5 +1,5 @@
 import { IsEmail, IsEnum, IsNotEmpty, IsString, MinLength } from 'class-validator';
-import { UserRole } from '../../../../schema/user.schema';
+import { UserRole } from './auth-request.dto';
 
 export class AdminUserCreateRequestDto {
   @IsEmail()

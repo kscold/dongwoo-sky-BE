@@ -3,17 +3,12 @@ export class PricingEquipmentResponseDto {
   name: string;
   description: string;
   imageUrl?: string;
-  isActive: boolean;
-  sortOrder: number;
-  specifications?: string;
-  priceRange?: string;
-  tonnage?: string;
-  maxHeight?: string;
-  maxWeight?: string;
   iconUrl?: string;
+  basePrice?: number;
+  hourlyRate?: number;
+  baseHours?: number;
+  minHours?: number;
+  maxHours?: number;
   priceRanges?: string[];
-  showInService: boolean;
-  showInPricing: boolean;
-  createdAt: Date;
-  updatedAt: Date;
+  workingTimeRanges?: string[];
 }

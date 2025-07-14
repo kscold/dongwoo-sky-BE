@@ -1,15 +1,7 @@
 import { memoryStorage } from 'multer';
+import { ALLOWED_IMAGE_MIMES, FileUploadOptions } from '../dto/file.dto';
 
-export const allowedMimes = [
-  'image/jpeg',
-  'image/jpg',
-  'image/png',
-  'image/gif',
-  'image/webp',
-  'image/heic',
-  'image/heif',
-  'image/avif',
-];
+export const allowedMimes = [...ALLOWED_IMAGE_MIMES];
 
 export const fileUploadOptions = {
   storage: memoryStorage(),
@@ -21,4 +13,10 @@ export const fileUploadOptions = {
       cb(new Error(`지원하지 않는 이미지 형식입니다: ${file.mimetype}`), false);
     }
   },
+} as const;
+
+export const fileUploadConfig: FileUploadOptions = {
+  maxFileSize: 20 * 1024 * 1024, // 20MB
+  maxFiles: 10,
+  allowedMimes: ALLOWED_IMAGE_MIMES,
 };

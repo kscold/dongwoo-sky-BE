@@ -1,4 +1,4 @@
 export class ContactInfoResponseDto {
-    contactPhoneNumber: string
-    kakaoOpenChatUrl: string
+    contactPhoneNumber: string;
+    kakaoOpenChatUrl: string;
 } 
