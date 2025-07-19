@@ -1,0 +1,30 @@
+export class PageSeoResponseDto {
+  id: string;
+  url: string;
+  pageTitle: string;
+  metaTitle: string;
+  metaDescription: string;
+  metaKeywords: string[];
+  canonicalUrl: string;
+  ogTitle: string;
+  ogDescription: string;
+  ogImage: string;
+  ogType: string;
+  ogUrl: string;
+  ogSiteName: string;
+  twitterCard: string;
+  twitterTitle: string;
+  twitterDescription: string;
+  twitterImage: string;
+  twitterSite: string;
+  twitterCreator: string;
+  structuredData: Record<string, any>;
+  robots: string;
+  author: string;
+  viewport: string;
+  language: string;
+  isActive: boolean;
+  lastModified: Date;
+  createdAt: Date;
+  updatedAt: Date;
+}

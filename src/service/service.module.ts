@@ -7,6 +7,8 @@ import { WorkShowcaseModule } from './work-showcase/work-showcase.module';
 import { CustomerReviewModule } from './customer-review/customer-review.module';
 import { SiteSettingModule } from './site-setting/site-setting.module';
 import { ContactModule } from './contact/contact.module';
+import { SitemapModule } from './sitemap/sitemap.module';
+import { SeoModule } from './seo/seo.module';
 
 @Module({
   imports: [
@@ -18,6 +20,8 @@ import { ContactModule } from './contact/contact.module';
     CustomerReviewModule,
     SiteSettingModule,
     ContactModule,
+    SitemapModule,
+    SeoModule,
   ],
 })
 export class ServiceModule { }

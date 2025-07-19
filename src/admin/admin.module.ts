@@ -11,6 +11,8 @@ import { AdminWorkShowcaseModule } from './admin-work-showcase/admin-work-showca
 import { AdminPricingSettingModule } from './admin-pricing-setting/admin-pricing-setting.module';
 import { CustomerReviewModule } from './customer-review/customer-review.module';
 import { AdminStatsModule } from './admin-stats/admin-stats.module';
+import { AdminSitemapModule } from './admin-sitemap/admin-sitemap.module';
+import { AdminSeoModule } from './admin-seo/admin-seo.module';
 
 @Module({
   imports: [
@@ -19,6 +21,8 @@ import { AdminStatsModule } from './admin-stats/admin-stats.module';
     AdminPricingSettingModule,
     CustomerReviewModule,
     AdminStatsModule,
+    AdminSitemapModule,
+    AdminSeoModule,
     forwardRef(() => AdminUserModule),
     AdminHomeModule,
     AdminContactModule,
