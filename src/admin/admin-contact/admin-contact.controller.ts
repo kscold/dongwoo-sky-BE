@@ -1,4 +1,13 @@
-import { Controller, Get, Param, Patch, UseGuards, Put, Body, Query } from '@nestjs/common';
+import {
+    Controller,
+    Get,
+    Param,
+    Patch,
+    UseGuards,
+    Put,
+    Body,
+    Query,
+} from '@nestjs/common';
 
 import { Roles } from '../../common/decorator/roles.decorator';
 import { JwtAuthGuard } from '../../common/guard/jwt-auth.guard';
@@ -10,36 +19,46 @@ import { ContactService } from '../../service/contact/contact.service';
 import { UserRole } from '../../schema/user.schema';
 
 import { AdminContactListResponseDto } from './dto/response/admin-contact-list-response.dto';
+import { UpdateContactSettingsDto } from '../../service/contact/dto/update-contact-settings.dto';
 
 @Controller('admin/contact')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @Roles(UserRole.ADMIN)
 export class AdminContactController {
-  constructor(
-    private readonly adminContactService: AdminContactService,
-    private readonly contactService: ContactService,
-  ) {}
+    constructor(
+        private readonly adminContactService: AdminContactService,
+        private readonly contactService: ContactService,
+    ) {}
 
-  @Get('list')
-  async getContactList(): Promise<AdminContactListResponseDto> {
-    return this.adminContactService.getContactList();
-  }
+    @Get('list')
+    async getContactList(): Promise<AdminContactListResponseDto> {
+        return this.adminContactService.getContactList();
+    }
 
-  @Patch(':id/read')
-  async markAsRead(@Param('id') id: string): Promise<{ success: boolean }> {
-    return this.adminContactService.markAsRead(id);
-  }
+    @Patch(':id/read')
+    async markAsRead(@Param('id') id: string): Promise<{ success: boolean }> {
+        return this.adminContactService.markAsRead(id);
+    }
 
-  @Get('settings')
-  async getContactSettings() {
-    return await this.contactService.getContactSettings();
-  }
+    @Get('settings')
+    async getContactSettings() {
+        return await this.adminContactService.getContactSettings();
+    }
 
-  @Get('inquiries')
-  async getAllInquiries(
-    @Query('page') page: number = 1,
-    @Query('limit') limit: number = 10,
-  ) {
-    return await this.contactService.getAllInquiries(page, limit);
-  }
+    @Put('settings')
+    async updateContactSettings(
+        @Body() updateContactSettingsDto: UpdateContactSettingsDto,
+    ) {
+        return await this.adminContactService.updateContactSettings(
+            updateContactSettingsDto,
+        );
+    }
+
+    @Get('inquiries')
+    async getAllInquiries(
+        @Query('page') page: number = 1,
+        @Query('limit') limit: number = 10,
+    ) {
+        return await this.adminContactService.getAllInquiries(page, limit);
+    }
 }

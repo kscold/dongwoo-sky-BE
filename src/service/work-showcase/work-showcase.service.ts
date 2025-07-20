@@ -2,6 +2,8 @@ import {
   Injectable,
   InternalServerErrorException,
   NotFoundException,
+  BadRequestException,
+  Logger,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
@@ -12,6 +14,8 @@ import {
 
 @Injectable()
 export class WorkShowcaseService {
+  private readonly logger = new Logger(WorkShowcaseService.name);
+
   constructor(
     @InjectModel(WorkShowcase.name)
     private workShowcaseModel: Model<WorkShowcaseDocument>,
@@ -47,10 +51,8 @@ export class WorkShowcaseService {
         totalPages,
       };
     } catch (error) {
-      // TODO: Add logger
-      throw new InternalServerErrorException(
-        '작업 사례 목록을 가져오는 중 오류가 발생했습니다.',
-      );
+      this.logger.error('작업 사례 목록 조회 실패:', error);
+      throw new BadRequestException('작업 사례 목록을 불러올 수 없습니다.');
     }
   }
 
@@ -69,10 +71,8 @@ export class WorkShowcaseService {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      // TODO: Add logger
-      throw new InternalServerErrorException(
-        `작업 사례를 가져오는 중 오류가 발생했습니다: ${id}`,
-      );
+      this.logger.error(`작업 사례 조회 실패: ${id}`, error);
+      throw new BadRequestException('작업 사례를 불러올 수 없습니다.');
     }
   }
 
@@ -83,7 +83,7 @@ export class WorkShowcaseService {
         .exec();
     } catch (error) {
       // 조회수 증가 실패는 중요하지 않으므로 에러를 던지지 않음
-      console.error(`조회수 증가 실패: ${id}`, error);
+      this.logger.warn(`조회수 증가 실패: ${id}`, error.message);
     }
   }
 
@@ -102,9 +102,8 @@ export class WorkShowcaseService {
       if (error instanceof NotFoundException) {
         throw error;
       }
-      throw new InternalServerErrorException(
-        `좋아요 증가 중 오류가 발생했습니다: ${id}`,
-      );
+      this.logger.error(`좋아요 증가 실패: ${id}`, error);
+      throw new BadRequestException('좋아요 표시에 실패했습니다.');
     }
   }
 }

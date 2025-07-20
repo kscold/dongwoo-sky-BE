@@ -8,26 +8,26 @@ import { HomeService } from './home.service';
 import { Home, HomeSchema } from '../../schema/home.schema';
 import { Notice, NoticeSchema } from '../../schema/notice.schema';
 import {
-  WorkShowcase,
-  WorkShowcaseSchema,
+    WorkShowcase,
+    WorkShowcaseSchema,
 } from '../../schema/work-showcase.schema';
 import {
-  CustomerReview,
-  CustomerReviewSchema,
+    CustomerReview,
+    CustomerReviewSchema,
 } from '../../schema/customer-review.schema';
 import { SiteSettingModule } from '../site-setting/site-setting.module';
 
 @Module({
-  imports: [
-    MongooseModule.forFeature([
-      { name: Home.name, schema: HomeSchema },
-      { name: Notice.name, schema: NoticeSchema },
-      { name: WorkShowcase.name, schema: WorkShowcaseSchema },
-      { name: CustomerReview.name, schema: CustomerReviewSchema },
-    ]),
-    SiteSettingModule,
-  ],
-  controllers: [HomeController],
-  providers: [HomeService],
+    imports: [
+        MongooseModule.forFeature([
+            { name: Home.name, schema: HomeSchema },
+            { name: Notice.name, schema: NoticeSchema },
+            { name: WorkShowcase.name, schema: WorkShowcaseSchema },
+            { name: CustomerReview.name, schema: CustomerReviewSchema },
+        ]),
+        SiteSettingModule,
+    ],
+    controllers: [HomeController],
+    providers: [HomeService],
 })
-export class HomeModule { }
+export class HomeModule {}

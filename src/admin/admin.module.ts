@@ -9,27 +9,26 @@ import { AdminSiteSettingModule } from './admin-site-setting/admin-site-setting.
 import { AdminEquipmentModule } from './admin-equipment/admin-equipment.module';
 import { AdminWorkShowcaseModule } from './admin-work-showcase/admin-work-showcase.module';
 import { AdminPricingSettingModule } from './admin-pricing-setting/admin-pricing-setting.module';
-import { CustomerReviewModule } from './customer-review/customer-review.module';
+import { AdminCustomerReviewModule } from './admin-customer-review/admin-customer-review.module';
 import { AdminStatsModule } from './admin-stats/admin-stats.module';
 import { AdminSitemapModule } from './admin-sitemap/admin-sitemap.module';
 import { AdminSeoModule } from './admin-seo/admin-seo.module';
 
 @Module({
-  imports: [
-    AdminEquipmentModule,
-    AdminWorkShowcaseModule,
-    AdminPricingSettingModule,
-    CustomerReviewModule,
-    AdminStatsModule,
-    AdminSitemapModule,
-    AdminSeoModule,
-    forwardRef(() => AdminUserModule),
-    AdminHomeModule,
-    AdminContactModule,
-    AdminNoticeModule,
-    AdminServiceGuideModule,
-    forwardRef(() => AdminSiteSettingModule),
-  ],
+    imports: [
+        forwardRef(() => AdminUserModule),
+        forwardRef(() => AdminSiteSettingModule),
+        AdminEquipmentModule,
+        AdminWorkShowcaseModule,
+        AdminPricingSettingModule,
+        AdminCustomerReviewModule,
+        AdminStatsModule,
+        AdminSitemapModule,
+        AdminSeoModule,
+        AdminHomeModule,
+        AdminContactModule,
+        AdminNoticeModule,
+        AdminServiceGuideModule,
+    ],
 })
-export class AdminModule { }
-
+export class AdminModule {}

@@ -1,12 +1,12 @@
 import { IsString } from 'class-validator';
 
 export class AdminHomeCreateHeroTitleDto {
-  @IsString()
-  preTitle: string;
+    @IsString()
+    preTitle: string;
 
-  @IsString()
-  mainTitle: string;
+    @IsString()
+    mainTitle: string;
 
-  @IsString()
-  postTitle: string;
+    @IsString()
+    postTitle: string;
 }

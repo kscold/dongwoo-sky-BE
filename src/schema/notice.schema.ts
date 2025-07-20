@@ -4,10 +4,13 @@ import { Document } from 'mongoose';
 @Schema({ _id: false })
 class Attachment {
   @Prop({ required: true })
-  fileUrl: string;
+  url: string;
 
   @Prop({ required: true })
-  fileName: string;
+  name: string;
+
+  @Prop({ required: true })
+  key: string;
 }
 const AttachmentSchema = SchemaFactory.createForClass(Attachment);
 
@@ -17,6 +20,12 @@ export type NoticeDocument = Notice & Document;
   timestamps: true, // createdAt, updatedAt 자동 추가
   versionKey: false, // __v 필드 제거
   collection: 'notices',
+  toJSON: {
+    transform: function(doc, ret) {
+      ret._id = ret._id.toString();
+      return ret;
+    }
+  }
 })
 export class Notice {
   @Prop({ required: true })

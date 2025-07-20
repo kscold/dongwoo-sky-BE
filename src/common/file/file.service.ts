@@ -31,7 +31,10 @@ export class FileService {
     allowedExtensions: readonly string[] = ALLOWED_ALL_EXTENSIONS,
   ): boolean {
     const ext = filename.split('.').pop()?.toLowerCase();
-    return ext ? allowedExtensions.includes(ext) : false;
+    if (!ext) return false;
+    
+    // 확장자 앞에 .을 붙여서 체크하거나 .없이 체크
+    return allowedExtensions.includes(`.${ext}`) || allowedExtensions.includes(ext);
   }
 
   /**

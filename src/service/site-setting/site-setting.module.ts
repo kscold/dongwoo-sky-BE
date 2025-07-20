@@ -1,11 +1,14 @@
-import { Module } from "@nestjs/common"
-import { MongooseModule } from "@nestjs/mongoose"
+import { Module } from '@nestjs/common';
+import { MongooseModule } from '@nestjs/mongoose';
+
+import { SiteSettingController } from './site-setting.controller';
+
+import { SiteSettingService } from './site-setting.service';
+
 import {
     SiteSetting,
     SiteSettingSchema,
-} from "src/schema/site-setting.schema"
-import { SiteSettingController } from "./site-setting.controller"
-import { SiteSettingService } from "./site-setting.service"
+} from '../../schema/site-setting.schema';
 
 @Module({
     imports: [
@@ -17,4 +20,4 @@ import { SiteSettingService } from "./site-setting.service"
     providers: [SiteSettingService],
     exports: [SiteSettingService],
 })
-export class SiteSettingModule { } 
+export class SiteSettingModule {}

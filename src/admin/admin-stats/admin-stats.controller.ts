@@ -3,10 +3,10 @@ import { AdminStatsService } from './admin-stats.service';
 
 @Controller('admin/stats')
 export class AdminStatsController {
-  constructor(private readonly adminStatsService: AdminStatsService) {}
+    constructor(private readonly adminStatsService: AdminStatsService) {}
 
-  @Get()
-  async getStats() {
-    return this.adminStatsService.getOverallStats();
-  }
+    @Get()
+    async getStats() {
+        return this.adminStatsService.getOverallStats();
+    }
 }

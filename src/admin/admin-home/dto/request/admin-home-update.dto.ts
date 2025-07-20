@@ -4,80 +4,80 @@ import {
     IsArray,
     ValidateNested,
     IsBoolean,
-} from "class-validator"
-import { Type } from "class-transformer"
+} from 'class-validator';
+import { Type } from 'class-transformer';
 
 class HeroButtonDto {
     @IsString()
-    text: string
+    text: string;
 
     @IsString()
-    link: string
+    link: string;
 }
 
 class HeroSectionDto {
     @IsString()
     @IsOptional()
-    title?: string
+    title?: string;
 
     @IsString()
     @IsOptional()
-    companyName?: string
+    companyName?: string;
 
     @IsString()
     @IsOptional()
-    highlightText?: string
+    highlightText?: string;
 
     @IsString()
     @IsOptional()
-    subtitle?: string
+    subtitle?: string;
 
     @IsString()
     @IsOptional()
-    description?: string
+    description?: string;
 
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => HeroButtonDto)
     @IsOptional()
-    ctaButtons?: HeroButtonDto[]
+    ctaButtons?: HeroButtonDto[];
 
     @IsArray()
     @IsOptional()
-    backgroundImageUrls?: any[]
+    backgroundImageUrls?: any[];
 
     @IsBoolean()
     @IsOptional()
-    isActive?: boolean
+    isActive?: boolean;
 }
 
 class ContentSettingDto {
     @IsString()
     @IsOptional()
-    key?: string
+    key?: string;
 
     @IsString()
     @IsOptional()
-    title?: string
+    title?: string;
 
     @IsString()
     @IsOptional()
-    description?: string
+    description?: string;
 
     @IsBoolean()
     @IsOptional()
-    isActive?: boolean
+    isActive?: boolean;
 }
 
 export class AdminHomeUpdateDto {
     @IsOptional()
     @ValidateNested()
     @Type(() => HeroSectionDto)
-    heroSection?: HeroSectionDto
+    heroSection?: HeroSectionDto;
 
     @IsArray()
     @ValidateNested({ each: true })
     @Type(() => ContentSettingDto)
     @IsOptional()
-    contentSettings?: ContentSettingDto[]
+    contentSettings?: ContentSettingDto[];
 }

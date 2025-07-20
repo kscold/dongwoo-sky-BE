@@ -7,13 +7,17 @@ import {
     HttpException,
     HttpStatus,
 } from '@nestjs/common';
-import { AdminPricingSettingService } from './admin-pricing-setting.service';
-import { AdminPricingSettingUpdateRequestDto } from './dto/request/admin-pricing-setting-update-request.dto';
-import { AdminPricingSettingResponseDto } from './dto/response/admin-pricing-setting-response.dto';
+
 import { JwtAuthGuard } from '../../common/guard/jwt-auth.guard';
 import { RolesGuard } from '../../common/guard/roles.guard';
 import { Roles } from '../../common/decorator/roles.decorator';
+
+import { AdminPricingSettingService } from './admin-pricing-setting.service';
+
 import { UserRole } from '../../schema/user.schema';
+
+import { AdminPricingSettingUpdateRequestDto } from './dto/request/admin-pricing-setting-update-request.dto';
+import { AdminPricingSettingResponseDto } from './dto/response/admin-pricing-setting-response.dto';
 
 @Controller('admin/pricing-setting')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -21,7 +25,7 @@ import { UserRole } from '../../schema/user.schema';
 export class AdminPricingSettingController {
     constructor(
         private readonly adminPricingSettingService: AdminPricingSettingService,
-    ) { }
+    ) {}
 
     @Get()
     async getPricingSettings(): Promise<AdminPricingSettingResponseDto> {
@@ -50,4 +54,4 @@ export class AdminPricingSettingController {
             );
         }
     }
-} 
+}

@@ -1,24 +1,24 @@
 import { IsString, IsArray, IsOptional } from 'class-validator';
 
 export class AdminHomeProfileUpdateDto {
-  @IsString()
-  name: string;
+    @IsString()
+    name: string;
 
-  @IsString()
-  title: string;
+    @IsString()
+    title: string;
 
-  @IsString()
-  introduction: string;
+    @IsString()
+    introduction: string;
 
-  @IsArray()
-  @IsString({ each: true })
-  careers: string[];
+    @IsArray()
+    @IsString({ each: true })
+    careers: string[];
 
-  @IsArray()
-  @IsString({ each: true })
-  skills: string[];
+    @IsArray()
+    @IsString({ each: true })
+    skills: string[];
 
-  @IsOptional()
-  @IsString()
-  profileImage?: string;
+    @IsOptional()
+    @IsString()
+    profileImage?: string;
 }

@@ -1,8 +1,14 @@
 import { Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
+
 import { AdminPricingSettingController } from './admin-pricing-setting.controller';
+
 import { AdminPricingSettingService } from './admin-pricing-setting.service';
-import { PricingSetting, PricingSettingSchema } from '../../schema/pricing-setting.schema';
+
+import {
+    PricingSetting,
+    PricingSettingSchema,
+} from '../../schema/pricing-setting.schema';
 
 @Module({
     imports: [
@@ -14,4 +20,4 @@ import { PricingSetting, PricingSettingSchema } from '../../schema/pricing-setti
     providers: [AdminPricingSettingService],
     exports: [AdminPricingSettingService],
 })
-export class AdminPricingSettingModule { } 
+export class AdminPricingSettingModule {}

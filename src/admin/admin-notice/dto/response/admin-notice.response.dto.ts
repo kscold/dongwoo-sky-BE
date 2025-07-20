@@ -1,5 +1,5 @@
 export class AdminNoticeResponseDto {
-  id: string;
+  _id: string;
   title: string;
   content: string;
   isPublished: boolean;
@@ -9,4 +9,9 @@ export class AdminNoticeResponseDto {
   tags?: string[];
   createdAt: Date;
   updatedAt: Date;
+  attachments?: {
+    name: string;
+    url: string;
+    key: string;
+  }[];
 } 

@@ -1,15 +1,15 @@
 import { IsString } from 'class-validator';
 
 export class AdminHomeCreateHeroButtonsDto {
-  @IsString()
-  primaryButtonText: string;
+    @IsString()
+    primaryButtonText: string;
 
-  @IsString()
-  primaryButtonLink: string;
+    @IsString()
+    primaryButtonLink: string;
 
-  @IsString()
-  secondaryButtonText: string;
+    @IsString()
+    secondaryButtonText: string;
 
-  @IsString()
-  secondaryButtonLink: string;
+    @IsString()
+    secondaryButtonLink: string;
 }

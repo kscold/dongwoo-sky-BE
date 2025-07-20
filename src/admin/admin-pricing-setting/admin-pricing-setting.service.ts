@@ -1,56 +1,55 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { PricingSetting, PricingSettingDocument } from '../../schema/pricing-setting.schema';
+import { plainToInstance } from 'class-transformer';
+
+import {
+    PricingSetting,
+    PricingSettingDocument,
+} from '../../schema/pricing-setting.schema';
+
 import { AdminPricingSettingUpdateRequestDto } from './dto/request/admin-pricing-setting-update-request.dto';
 import { AdminPricingSettingResponseDto } from './dto/response/admin-pricing-setting-response.dto';
-import { DEFAULT_PRICING_SETTINGS } from '../../common/constants/default-pricing-settings.constant';
 
 @Injectable()
 export class AdminPricingSettingService {
     constructor(
         @InjectModel(PricingSetting.name)
         private pricingSettingModel: Model<PricingSettingDocument>,
-    ) { }
+    ) {}
 
     async getPricingSettings(): Promise<AdminPricingSettingResponseDto> {
-        let pricingSetting: PricingSettingDocument | null = await this.pricingSettingModel.findOne({ isActive: true }).exec();
+        const pricingSetting: PricingSettingDocument | null =
+            await this.pricingSettingModel.findOne({ isActive: true }).exec();
 
         if (!pricingSetting) {
-            pricingSetting = await this.createDefaultPricingSetting();
+            throw new BadRequestException('가격 설정 데이터가 없습니다.');
         }
 
         return this.mapToResponseDto(pricingSetting);
     }
 
-    async updatePricingSettings(updateDto: AdminPricingSettingUpdateRequestDto): Promise<AdminPricingSettingResponseDto> {
+    async updatePricingSettings(
+        updateDto: AdminPricingSettingUpdateRequestDto,
+    ): Promise<AdminPricingSettingResponseDto> {
         const { id, ...updateData } = updateDto;
 
-        let pricingSetting: PricingSettingDocument | null;
+        const pricingSetting: PricingSettingDocument =
+            await this.pricingSettingModel
+                .findByIdAndUpdate(id, updateData, { new: true })
+                .exec();
 
-        if (id) {
-            pricingSetting = await this.pricingSettingModel.findByIdAndUpdate(
-                id,
-                updateData,
-                { new: true }
-            ).exec();
-
-            if (!pricingSetting) {
-                pricingSetting = await this.createDefaultPricingSetting();
-            }
-        } else {
-            pricingSetting = await this.createDefaultPricingSetting();
+        if (!pricingSetting) {
+            throw new BadRequestException('가격 설정 데이터가 없습니다.');
         }
 
         return this.mapToResponseDto(pricingSetting);
     }
 
-    private async createDefaultPricingSetting(): Promise<PricingSettingDocument> {
-        return await this.pricingSettingModel.create(DEFAULT_PRICING_SETTINGS);
-    }
-
-    private mapToResponseDto(pricingSetting: PricingSettingDocument): AdminPricingSettingResponseDto {
-        return {
+    private mapToResponseDto(
+        pricingSetting: PricingSettingDocument,
+    ): AdminPricingSettingResponseDto {
+        const responseData = {
             _id: pricingSetting._id.toString(),
             mainTitle: pricingSetting.mainTitle,
             mainSubtitle: pricingSetting.mainSubtitle,
@@ -58,7 +57,8 @@ export class AdminPricingSettingService {
             discountBannerSubtitle: pricingSetting.discountBannerSubtitle,
             discountPercentage: pricingSetting.discountPercentage,
             equipmentSectionTitle: pricingSetting.equipmentSectionTitle,
-            equipmentSectionDescription: pricingSetting.equipmentSectionDescription,
+            equipmentSectionDescription:
+                pricingSetting.equipmentSectionDescription,
             timeSectionTitle: pricingSetting.timeSectionTitle,
             timeSectionDescription: pricingSetting.timeSectionDescription,
             priceCardTitle: pricingSetting.priceCardTitle,
@@ -84,5 +84,7 @@ export class AdminPricingSettingService {
             createdAt: pricingSetting.createdAt,
             updatedAt: pricingSetting.updatedAt,
         };
+
+        return plainToInstance(AdminPricingSettingResponseDto, responseData);
     }
-} 
+}

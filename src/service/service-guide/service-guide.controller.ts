@@ -5,10 +5,10 @@ import { ApiResponseInterceptor } from 'src/common/interceptor/api-response.inte
 @Controller('service/service-guide')
 @UseInterceptors(ApiResponseInterceptor)
 export class ServiceGuideController {
-  constructor(private readonly serviceGuideService: ServiceGuideService) { }
+    constructor(private readonly serviceGuideService: ServiceGuideService) {}
 
-  @Get()
-  async getServiceGuidePage() {
-    return this.serviceGuideService.getServiceGuidePageData();
-  }
+    @Get()
+    async getServiceGuidePage() {
+        return this.serviceGuideService.getServiceGuidePageData();
+    }
 }

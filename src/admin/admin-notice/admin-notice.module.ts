@@ -8,6 +8,7 @@ import { AdminNoticeService } from './admin-notice.service';
 import { Notice, NoticeSchema } from '../../schema/notice.schema';
 
 import { CommonModule } from '../../common/common.module';
+import { FileModule } from '../../common/file/file.module';
 import { JwtModule } from '@nestjs/jwt';
 
 @Module({
@@ -15,6 +16,7 @@ import { JwtModule } from '@nestjs/jwt';
     JwtModule,
     MongooseModule.forFeature([{ name: Notice.name, schema: NoticeSchema }]),
     CommonModule,
+    FileModule,
   ],
   controllers: [AdminNoticeController],
   providers: [AdminNoticeService],
