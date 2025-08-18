@@ -30,7 +30,7 @@ export class CustomerReviewService {
     async findAllForService(
         page: number = 1,
         limit: number = 10,
-    ): Promise<PaginatedResponse<CustomerReviewDocument>> {
+    ): Promise<PaginatedResponse<any>> {
         try {
             const skip = (page - 1) * limit;
 
@@ -46,8 +46,19 @@ export class CustomerReviewService {
                     .exec(),
             ]);
 
+            // 각 아이템에 summary 추가
+            const itemsWithSummary = items.map(item => {
+                const itemObj = item.toObject();
+                return {
+                    ...itemObj,
+                    summary: this.generateSummary(item.content),
+                    createdAt: item.createdAt,
+                    updatedAt: item.updatedAt,
+                };
+            });
+
             return {
-                items,
+                items: itemsWithSummary,
                 totalPages: Math.ceil(totalItems / limit),
                 currentPage: page,
                 totalItems,
@@ -58,6 +69,17 @@ export class CustomerReviewService {
                 '고객 리뷰 목록을 불러올 수 없습니다.',
             );
         }
+    }
+
+    private generateSummary(content: string): string {
+        if (!content) return '';
+        
+        // HTML 태그 제거
+        const textOnly = content.replace(/<[^>]*>/g, '');
+        // 연속된 공백 및 줄바꿈 정리
+        const cleaned = textOnly.replace(/\s+/g, ' ').trim();
+        // 150자로 제한하고 말줄임표 추가
+        return cleaned.length > 150 ? cleaned.substring(0, 150) + '...' : cleaned;
     }
 
     /**

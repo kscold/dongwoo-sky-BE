@@ -296,7 +296,7 @@ export class AdminHomeService {
 
     private mapHomeToResponseDto(home: HomeDocument): AdminHomeResponseDto {
         const ctaButtons = home.heroSection?.ctaButtons || [];
-        const responseData = {
+        const responseData: AdminHomeResponseDto = {
             _id: home._id?.toString(),
             pageId: home.key,
             heroTitle: {
@@ -319,6 +319,6 @@ export class AdminHomeService {
             sortOrder: (home as any).sortOrder ?? 0,
         };
 
-        return plainToInstance(AdminHomeResponseDto, responseData);
+        return responseData;
     }
 }

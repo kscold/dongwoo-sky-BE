@@ -15,10 +15,14 @@ export class NoticeService {
     ) {}
 
     private toResponseDto(notice: NoticeDocument): NoticeResponseDto {
+        // content에서 HTML 태그 제거하고 첫 150자로 요약 생성
+        const summary = this.generateSummary(notice.content);
+        
         return {
             _id: notice._id.toString(),
             title: notice.title,
             content: notice.content,
+            summary,
             isPublished: notice.isPublished,
             isModal: notice.isModal,
             modalEndDate: notice.modalEndDate,
@@ -28,6 +32,17 @@ export class NoticeService {
             createdAt: (notice as any).createdAt,
             updatedAt: (notice as any).updatedAt,
         };
+    }
+
+    private generateSummary(content: string): string {
+        if (!content) return '';
+        
+        // HTML 태그 제거
+        const textOnly = content.replace(/<[^>]*>/g, '');
+        // 연속된 공백 및 줄바꿈 정리
+        const cleaned = textOnly.replace(/\s+/g, ' ').trim();
+        // 150자로 제한하고 말줄임표 추가
+        return cleaned.length > 150 ? cleaned.substring(0, 150) + '...' : cleaned;
     }
 
     async getModalNotice(): Promise<NoticeResponseDto | null> {

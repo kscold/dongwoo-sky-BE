@@ -22,7 +22,7 @@ export class WorkShowcaseService {
   ) { }
 
   async findAll(page: number = 1, limit: number = 10): Promise<{
-    data: WorkShowcase[];
+    data: any[];
     total: number;
     page: number;
     limit: number;
@@ -31,7 +31,7 @@ export class WorkShowcaseService {
     try {
       const skip = (page - 1) * limit;
       
-      const [data, total] = await Promise.all([
+      const [items, total] = await Promise.all([
         this.workShowcaseModel
           .find({ isActive: true })
           .sort({ publishedAt: -1 })
@@ -41,10 +41,21 @@ export class WorkShowcaseService {
         this.workShowcaseModel.countDocuments({ isActive: true }).exec(),
       ]);
 
+      // 각 아이템에 summary 추가
+      const dataWithSummary = items.map(item => {
+        const itemObj = item.toObject();
+        return {
+          ...itemObj,
+          summary: this.generateSummary(item.content),
+          createdAt: item.createdAt,
+          updatedAt: item.updatedAt,
+        };
+      });
+
       const totalPages = Math.ceil(total / limit);
 
       return {
-        data,
+        data: dataWithSummary,
         total,
         page,
         limit,
@@ -54,6 +65,17 @@ export class WorkShowcaseService {
       this.logger.error('작업 사례 목록 조회 실패:', error);
       throw new BadRequestException('작업 사례 목록을 불러올 수 없습니다.');
     }
+  }
+
+  private generateSummary(content: string): string {
+    if (!content) return '';
+    
+    // HTML 태그 제거
+    const textOnly = content.replace(/<[^>]*>/g, '');
+    // 연속된 공백 및 줄바꿈 정리
+    const cleaned = textOnly.replace(/\s+/g, ' ').trim();
+    // 150자로 제한하고 말줄임표 추가
+    return cleaned.length > 150 ? cleaned.substring(0, 150) + '...' : cleaned;
   }
 
   async findOne(id: string): Promise<WorkShowcase> {
